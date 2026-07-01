@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4CAF50"/>
+      <stop offset="100%" stop-color="#2E7D32"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#81C784"/>
+      <stop offset="100%" stop-color="#4CAF50"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="224" fill="#0a0a0f"/>
+  
+  <!-- Leaf shape -->
+  <path d="M512 160 C512 160, 320 320, 280 480 C240 640, 280 800, 512 864 C744 800, 784 640, 744 480 C704 320, 512 160, 512 160Z" 
+        fill="url(#g)" opacity="0.9"/>
+  
+  <!-- Leaf vein -->
+  <path d="M512 160 L512 864" stroke="#81C784" stroke-width="4" opacity="0.4"/>
+  
+  <!-- Glowing nodes -->
+  <circle cx="400" cy="350" r="12" fill="#81C784">
+    <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="600" cy="380" r="10" fill="#A5D6A7">
+    <animate attributeName="opacity" values="0.6;1;0.6" dur="2.5s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="350" cy="500" r="14" fill="#81C784">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="680" cy="550" r="11" fill="#A5D6A7">
+    <animate attributeName="opacity" values="0.3;1;0.3" dur="1.8s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="450" cy="650" r="13" fill="#81C784">
+    <animate attributeName="opacity" values="0.5;1;0.5" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="580" cy="700" r="9" fill="#C8E6C9">
+    <animate attributeName="opacity" values="0.4;1;0.4" dur="2.8s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Center node -->
+  <circle cx="512" cy="512" r="20" fill="url(#g2)">
+    <animate attributeName="r" values="20;24;20" dur="3s" repeatCount="indefinite"/>
+  </circle>
+  
+  <!-- Connecting lines -->
+  <line x1="512" y1="512" x2="400" y2="350" stroke="#81C784" stroke-width="2" opacity="0.3"/>
+  <line x1="512" y1="512" x2="600" y2="380" stroke="#81C784" stroke-width="2" opacity="0.3"/>
+  <line x1="512" y1="512" x2="350" y2="500" stroke="#81C784" stroke-width="2" opacity="0.3"/>
+  <line x1="512" y1="512" x2="680" y2="550" stroke="#81C784" stroke-width="2" opacity="0.3"/>
+  <line x1="512" y1="512" x2="450" y2="650" stroke="#81C784" stroke-width="2" opacity="0.3"/>
+  <line x1="512" y1="512" x2="580" y2="700" stroke="#81C784" stroke-width="2" opacity="0.3"/>
+</svg>

@@ -1,0 +1,102 @@
+openapi: "3.0.0"
+info:
+  title: SynCoin API
+  description: API P2P du réseau SynCoin - For the common good
+  version: "0.1.0"
+  contact:
+    name: SynCoin Community
+    url: https://github.com/Boxxji/syncoin
+
+servers:
+  - url: http://localhost:8766
+    description: Nœud local par défaut
+
+paths:
+  /:
+    post:
+      summary: Interagir avec le nœud
+      operationId: nodeAction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                action:
+                  type: string
+                  enum: [ping, compute, stats, peers]
+                  description: Action à exécuter
+                cycles:
+                  type: integer
+                  description: Nombre de cycles de compute (pour action=compute)
+              required:
+                - action
+      responses:
+        "200":
+          description: Succès
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PongResponse'
+                  - $ref: '#/components/schemas/ComputeResponse'
+                  - $ref: '#/components/schemas/StatsResponse'
+                  - $ref: '#/components/schemas/PeersResponse'
+
+components:
+  schemas:
+    PongResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: pong
+        node:
+          type: string
+          description: ID du nœud
+      required: [status, node]
+
+    ComputeResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+        olona:
+          type: integer
+          description: Olona gagnés
+      required: [status, olona]
+
+    StatsResponse:
+      type: object
+      properties:
+        node:
+          type: string
+        peers:
+          type: integer
+        compute_shared:
+          type: integer
+        olona:
+          type: integer
+        nfts:
+          type: integer
+        trees_planted:
+          type: integer
+        version:
+          type: string
+        max_battery_pct:
+          type: integer
+        network:
+          type: string
+        mission:
+          type: string
+
+    PeersResponse:
+      type: object
+      properties:
+        peers:
+          type: array
+          items:
+            type: string
+## API Reference\n### POST /\n- `action: ping` → heartbeat

@@ -1,0 +1,11 @@
+[programs.devnet]
+syncoin_olona = "Fg6GsFp2z7Cz4v7e3v5dGq8hQh9UkNJLKpPqRrSsTtUv"
+syncoin_nft = "Fg6GsFp2z7Cz4v7e3v5dGq8hQh9UkNJLKpPqRrSsTtUv"
+
+[provider]
+cluster = "devnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "cargo test"
+deploy = "anchor deploy"

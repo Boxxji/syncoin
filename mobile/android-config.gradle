@@ -1,0 +1,14 @@
+// SynCoin Flutter - Configuration Android
+// Ajouter dans android/app/build.gradle
+
+android {
+    compileSdk 34
+    
+    defaultConfig {
+        applicationId "org.syncoin.app"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "0.1.0"
+    }
+}

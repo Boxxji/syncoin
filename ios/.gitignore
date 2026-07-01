@@ -1,0 +1,12 @@
+.build/
+.build/**
+*.pcm
+*.dia
+*.o
+*.d
+*.swiftmodule
+*.swiftdoc
+*.swiftsourceinfo
+.DS_Store
+xcuserdata/
+*.xcuserstate

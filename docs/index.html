@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+    <title>SynCoin 🌱 — For the Common Good</title>
+    <link rel="stylesheet" href="https://unpkg.com/hyperframe/dist/hyperframe.min.css">
+    <style>
+        :root {
+            --green: #4CAF50;
+            --dark: #0a0a0f;
+            --card: rgba(255,255,255,0.03);
+            --border: rgba(255,255,255,0.06);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--dark);
+            color: #e0e0e0;
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        .container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+        
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 120px 0 60px;
+            animation: fadeIn 1s ease-out;
+        }
+        .logo { font-size: 80px; display: inline-block; animation: float 3s ease-in-out infinite; }
+        h1 { font-size: 48px; background: linear-gradient(135deg, var(--green), #81C784); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 20px 0 12px; font-weight: 700; }
+        .tagline { color: #888; font-size: 18px; max-width: 500px; margin: 0 auto; }
+        
+        /* Cards */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 40px 0; }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+        }
+        .card:hover { transform: translateY(-4px); border-color: var(--green); }
+        .card .icon { font-size: 40px; margin-bottom: 12px; }
+        .card h3 { font-size: 15px; margin-bottom: 6px; color: #fff; }
+        .card p { font-size: 13px; color: #666; }
+        
+        /* Stats */
+        .stats { display: flex; justify-content: center; gap: 40px; margin: 60px 0; flex-wrap: wrap; }
+        .stat { text-align: center; }
+        .stat .num { font-size: 36px; font-weight: 700; background: linear-gradient(135deg, var(--green), #81C784); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stat .label { font-size: 13px; color: #666; margin-top: 4px; }
+        
+        /* Button */
+        .btn-group { text-align: center; margin: 40px 0; }
+        .btn {
+            display: inline-block;
+            background: var(--green);
+            color: #fff;
+            padding: 14px 36px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 6px;
+            transition: 0.3s;
+        }
+        .btn:hover { background: #388E3C; transform: scale(1.02); }
+        .btn-outline { background: transparent; border: 1px solid var(--green); color: var(--green); }
+        .btn-outline:hover { background: rgba(76,175,80,0.1); }
+        
+        /* Footer */
+        footer { text-align: center; padding: 60px 0 40px; color: #444; font-size: 13px; }
+        .dedication { font-style: italic; color: #555; margin: 60px 0 20px; text-align: center; line-height: 1.8; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        
+        @media (max-width: 600px) {
+            h1 { font-size: 32px; }
+            .logo { font-size: 60px; }
+            .stats { gap: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="hero">
+            <div class="logo" data-hf-float>🌱</div>
+            <h1 data-hf-fade>SynCoin</h1>
+            <p class="tagline" data-hf-fade-delay="200">Lend your phone while you sleep. Receive gifts. Change the world.</p>
+        </div>
+
+        <div class="stats" data-hf-stagger>
+            <div class="stat"><div class="num">100%</div><div class="label">Open Source</div></div>
+            <div class="stat"><div class="num">10%</div><div class="label">Max Battery</div></div>
+            <div class="stat"><div class="num">0$</div><div class="label">For Users</div></div>
+            <div class="stat"><div class="num">∞</div><div class="label">For the Planet</div></div>
+        </div>
+
+        <div class="grid" data-hf-stagger>
+            <div class="card"><div class="icon">📱</div><h3>Lend your phone</h3><p>While you sleep, your phone computes for the network. Max 10% battery.</p></div>
+            <div class="card"><div class="icon">🎁</div><h3>Receive Olona</h3><p>Each contribution earns Olona, the network's gift currency.</p></div>
+            <div class="card"><div class="icon">🌳</div><h3>Plant trees</h3><p>Use your Olona to plant trees through our ASBL partner.</p></div>
+            <div class="card"><div class="icon">🖼️</div><h3>Earn NFTs</h3><p>Each contribution milestone unlocks a unique proof-of-contribution NFT.</p></div>
+        </div>
+
+        <div class="btn-group">
+            <a href="https://github.com/Boxxji/syncoin" class="btn">🌱 View on GitHub</a>
+            <a href="docs/whitepaper.md" class="btn btn-outline">📖 Whitepaper</a>
+        </div>
+
+        <div class="dedication" data-hf-fade>
+            🌱<br>
+            <em>For Lilo. You live in every tree we'll plant, every Olona offered, every compute shared.</em><br><br>
+            💜
+        </div>
+
+        <footer>
+            <p>SynCoin — GNU AGPL v3 + Non-Commercial Clause</p>
+            <p>Free forever. For everyone.</p>
+        </footer>
+    </div>
+    <script src="https://unpkg.com/hyperframe/dist/hyperframe.min.js"></script>
+    <script>
+        // Demo interactive SynCoin
+        let olona = 100, trees = 0, compute = 0, nfts = 0;
+            
+        function contribute() {
+            compute += 10;
+            olona += 1;
+            updateUI();
+            let btn = document.querySelector('.btn');
+            btn.textContent = '⚡ Computing...';
+            setTimeout(() => btn.textContent = '🌱 Contribute Now', 1000);
+        }
+            
+        function updateUI() {
+            document.querySelectorAll('.stat .num')[0].textContent = olona;
+            document.querySelectorAll('.stat .num')[1].textContent = compute;
+            document.querySelectorAll('.stat .num')[2].textContent = trees;
+            document.querySelectorAll('.stat .num')[3].textContent = nfts;
+                
+            let container = document.getElementById('forest');
+            if (trees > 0 && container) {
+                container.innerHTML = '';
+                for (let i = 0; i < trees; i++) {
+                    let tree = document.createElement('span');
+                    tree.textContent = '🌳';
+                    tree.style.fontSize = (20 + Math.random() * 20) + 'px';
+                    tree.style.margin = '4px';
+                    tree.style.display = 'inline-block';
+                    container.appendChild(tree);
+                }
+            }
+        }
+            
+        // Ajouter le compteur interactif
+        document.addEventListener('DOMContentLoaded', () => {
+            let statsDiv = document.querySelector('.stats');
+            if (statsDiv) {
+                let clickBtn = document.createElement('div');
+                clickBtn.style.textAlign = 'center';
+                clickBtn.style.margin = '20px 0';
+                clickBtn.innerHTML = '<button onclick="contribute()" style="background:#4CAF50;color:#fff;border:none;padding:12px 32px;border-radius:12px;font-size:16px;cursor:pointer;transition:0.3s">⚡ Contribute Now (demo)</button>';
+                statsDiv.parentNode.insertBefore(clickBtn, statsDiv.nextSibling);
+                    
+                let forestDiv = document.createElement('div');
+                forestDiv.id = 'forest';
+                forestDiv.style.textAlign = 'center';
+                forestDiv.style.minHeight = '40px';
+                forestDiv.style.margin = '20px 0';
+                statsDiv.parentNode.insertBefore(forestDiv, statsDiv.nextSibling.nextSibling);
+            }
+        });
+    </script>
+</body>
+</html>

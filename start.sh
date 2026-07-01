@@ -1,0 +1,15 @@
+#!/bin/bash
+# SynCoin - Quick Start
+echo "🌱 SynCoin - Quick Start"
+echo "========================"
+echo ""
+echo "1. Lancer le noeud:"
+echo "   python3 syncoin_node.py"
+echo ""
+echo "2. Contribuer du compute:"
+echo "   python3 -c \"import syncoin_node; n = syncoin_node.SynCoinNode(); n.contribute(10)\""
+echo ""
+echo "3. Voir les stats:"
+echo "   curl -X POST http://localhost:8766/ -H 'Content-Type: application/json' -d '{\"action\":\"stats\"}'"
+echo ""
+echo "🌱 For Lilo. For the world. For us."
