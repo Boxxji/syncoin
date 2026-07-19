@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  syncoin_node:
+    build: .
+    container_name: syncoin_node
+    restart: unless-stopped
+    ports:
+      - "8766:8766"
+    volumes:
+      - ./logs:/app/logs
+    environment:
+      - NODE_ENV=production
