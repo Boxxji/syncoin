@@ -1,343 +1,314 @@
 import SwiftUI
+import Foundation
+import CryptoKit
+import Accelerate
+
+// Base58 Encoder for Solana Address
+struct Base58 {
+    static let alphabet = [UInt8]("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz".utf8)
+    static func encode(_ bytes: [UInt8]) -> String {
+        var zeros = 0
+        for byte in bytes {
+            if byte == 0 { zeros += 1 } else { break }
+        }
+        var size = (bytes.count - zeros) * 138 / 100 + 1
+        var b58 = [UInt8](repeating: 0, count: size)
+        var length = 0
+        for byte in bytes[zeros...] {
+            var carry = UInt32(byte)
+            var i = 0
+            for j in (0..<b58.count).reversed() {
+                if carry == 0 && i >= length { break }
+                carry += UInt32(b58[j]) << 8
+                b58[j] = UInt8(carry % 58)
+                carry /= 58
+                i += 1
+            }
+            length = i
+        }
+        var i = 0
+        while i < b58.count && b58[i] == 0 { i += 1 }
+        var str = String(repeating: "1", count: zeros)
+        for j in i..<b58.count { str.append(Character(UnicodeScalar(alphabet[Int(b58[j])]))) }
+        return str
+    }
+}
 
 @main
 struct SynCoinApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            GrokTerminalView()
         }
     }
 }
 
-import SwiftUI
+// WebSocket Manager
+class NodeConnection: ObservableObject {
+    @Published var logs: [String] = [
+        "> SYNCOIN OS v0.3.0 INITIALIZED",
+        "> ACCELERATE vDSP ENGINE LOADED",
+        "> SOLANA DEVNET MODULE LOADED",
+    ]
+    @Published var isConnected = false
+    @Published var isComputing = false
+    @Published var solBalance: Double = 0.0
+    @Published var solanaAddress: String = ""
+    @Published var lastGflops: Double = 0.0
+    
+    private var webSocketTask: URLSessionWebSocketTask?
+    private var computeTimer: Timer?
+    private var privateKey: Curve25519.Signing.PrivateKey!
+    
+    init() {
+        setupWallet()
+    }
+    
+    private func setupWallet() {
+        if let keyData = UserDefaults.standard.data(forKey: "solana_priv_key") {
+            privateKey = try? Curve25519.Signing.PrivateKey(rawRepresentation: keyData)
+        }
+        if privateKey == nil {
+            privateKey = Curve25519.Signing.PrivateKey()
+            UserDefaults.standard.set(privateKey.rawRepresentation, forKey: "solana_priv_key")
+        }
+        
+        let pubKeyBytes = [UInt8](privateKey.publicKey.rawRepresentation)
+        solanaAddress = Base58.encode(pubKeyBytes)
+        addLog("> WALLET LOADED: \(solanaAddress.prefix(6))...\(solanaAddress.suffix(4))")
+    }
+    
+    func addLog(_ msg: String) {
+        DispatchQueue.main.async {
+            self.logs.append("> \(msg)")
+            if self.logs.count > 100 {
+                self.logs.removeFirst()
+            }
+        }
+    }
+    
+    func connect() {
+        guard let url = URL(string: "ws://127.0.0.1:8766") else { return }
+        addLog("CONNECTING TO SYNCOIN NETWORK [ws://127.0.0.1:8766]")
+        
+        let session = URLSession(configuration: .default)
+        webSocketTask = session.webSocketTask(with: url)
+        webSocketTask?.resume()
+        
+        isConnected = true
+        receiveMessage()
+        
+        // Handshake
+        let pingMsg = "{\"action\": \"ping\", \"address\": \"\(solanaAddress)\"}"
+        webSocketTask?.send(.string(pingMsg)) { error in
+            if let error = error {
+                self.addLog("FAILED TO SEND PING: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func disconnect() {
+        webSocketTask?.cancel(with: .goingAway, reason: nil)
+        isConnected = false
+        isComputing = false
+        computeTimer?.invalidate()
+        addLog("CONNECTION CLOSED BY USER.")
+    }
+    
+    private func receiveMessage() {
+        webSocketTask?.receive { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    self.isConnected = false
+                    self.isComputing = false
+                    self.computeTimer?.invalidate()
+                    self.addLog("CONNECTION ERROR: \(error.localizedDescription)")
+                }
+            case .success(let message):
+                switch message {
+                case .string(let text):
+                    self.handleJson(text)
+                default:
+                    break
+                }
+                if self.isConnected {
+                    self.receiveMessage()
+                }
+            }
+        }
+    }
+    
+    private func handleJson(_ text: String) {
+        guard let data = text.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            addLog("RECV: \(text)")
+            return
+        }
+        
+        if let status = json["status"] as? String {
+            if status == "ok", let reward = json["sol"] as? Double, let tx = json["tx"] as? String {
+                DispatchQueue.main.async {
+                    self.solBalance += reward
+                }
+                addLog("REWARD: +\(String(format: "%.4f", reward)) SOL")
+                addLog("TX: \(tx)")
+            } else if status == "pong", let node = json["node"] as? String {
+                addLog("CONNECTION ESTABLISHED. NODE_ID: \(node)")
+            } else {
+                addLog("RECV: \(text)")
+            }
+        }
+    }
+    
+    private func runBenchmark() -> Double {
+        let n = 500 // Matrix size (500x500 is fast but measurable)
+        var A = [Float](repeating: 1.0, count: n * n)
+        var B = [Float](repeating: 1.0, count: n * n)
+        var C = [Float](repeating: 0, count: n * n)
+        
+        let start = CFAbsoluteTimeGetCurrent()
+        cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans,
+                    Int32(n), Int32(n), Int32(n),
+                    1.0, &A, Int32(n),
+                    &B, Int32(n),
+                    0.0, &C, Int32(n))
+        let end = CFAbsoluteTimeGetCurrent()
+        let time = end - start
+        
+        let ops = 2.0 * pow(Double(n), 3)
+        let gigaFlops = (ops / time) / 1_000_000_000.0
+        return gigaFlops
+    }
+    
+    func toggleCompute() {
+        if !isConnected {
+            addLog("ERROR: NOT CONNECTED TO NETWORK")
+            return
+        }
+        
+        isComputing.toggle()
+        
+        if isComputing {
+            addLog("INITIATING ACCELERATE NATIVE COMPUTE...")
+            runComputeLoop()
+        } else {
+            addLog("COMPUTE SEQUENCE TERMINATED BY USER.")
+        }
+    }
+    
+    private func runComputeLoop() {
+        guard isComputing && isConnected else { return }
+        
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else { return }
+            
+            let gflops = self.runBenchmark()
+            
+            DispatchQueue.main.async {
+                guard self.isComputing && self.isConnected else { return }
+                
+                self.lastGflops = gflops
+                let msg = "{\"action\": \"compute\", \"gflops\": \(gflops), \"address\": \"\(self.solanaAddress)\"}"
+                
+                self.webSocketTask?.send(.string(msg)) { error in
+                    if error == nil {
+                        self.addLog(String(format: "TX: COMPUTE_PROVED [%.2f GFLOPS]", gflops))
+                    }
+                }
+                
+                // Anti-Boucle Morte : Respiration de 3 secondes avant le prochain calcul
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                    self.runComputeLoop()
+                }
+            }
+        }
+    }
+}
 
-struct ContentView: View {
-    @State private var olona = 100
-    @State private var trees = 0
-    @State private var compute = 0
-    @State private var nfts = 0
-    @State private var isContributing = false
-    @State private var selectedTab = 0
-    @State private var showAlert = false
-    @State private var alertMessage = ""
+// SwiftUI View
+struct GrokTerminalView: View {
+    @StateObject private var node = NodeConnection()
     
     var body: some View {
-        TabView(selection: $selectedTab) {
-            homeTab
-                .tabItem { Label("Accueil", systemImage: "house.fill") }
-                .tag(0)
-            
-            rewardsTab
-                .tabItem { Label("Récompenses", systemImage: "gift.fill") }
-                .tag(1)
-            
-            forestTab
-                .tabItem { Label("Forêt", systemImage: "tree.fill") }
-                .tag(2)
-            
-            profileTab
-                .tabItem { Label("Profil", systemImage: "person.fill") }
-                .tag(3)
-        }
-        .tint(.green)
-    }
-    
-    // MARK: - Accueil
-    var homeTab: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: 16) {
-                    // Header card
-                    VStack(spacing: 8) {
-                        Image(systemName: "leaf.fill")
-                            .font(.system(size: 48))
-                            .foregroundStyle(.green)
-                            .symbolEffect(.bounce, value: isContributing)
-                        
-                        Text("SynCoin")
-                            .font(.largeTitle.bold())
-                        
-                        Text("Prête ton téléphone. Reçois des cadeaux.")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.vertical, 24)
-                    
-                    // Stats grid
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                        StatCard(icon: "gift.fill", value: "\(olona)", label: "Olona", color: .yellow)
-                        StatCard(icon: "tree.fill", value: "\(trees)", label: "Arbres", color: .green)
-                        StatCard(icon: "bolt.fill", value: "\(compute)", label: "Compute", color: .blue)
-                        StatCard(icon: "photo.on.rectangle.fill", value: "\(nfts)", label: "NFTs", color: .purple)
-                    }
-                    
-                    // Contribute button
-                    Button(action: toggleContribute) {
-                        HStack {
-                            Image(systemName: isContributing ? "stop.circle.fill" : "play.circle.fill")
-                                .font(.title2)
-                            Text(isContributing ? "Stop" : "Contribuer")
-                                .font(.title3.weight(.semibold))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(isContributing ? Color.green : Color(uiColor: .systemGray5))
-                        .foregroundColor(isContributing ? .white : .primary)
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                    }
-                    
-                    // Info
-                    HStack {
-                        Image(systemName: "battery.25")
-                            .foregroundStyle(.secondary)
-                        Text("Max 10% batterie")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        Spacer()
-                        Text("For the common good")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.horizontal, 4)
-                }
-                .padding()
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Text("NET: \(node.isConnected ? "ONLINE" : "OFFLINE")")
+                Spacer()
+                Text("SOL: \(String(format: "%.4f", node.solBalance))")
+                Spacer()
+                Text(String(format: "%.1f GFLOPS", node.lastGflops))
             }
-            .background(Color(.systemGroupedBackground))
-            .navigationTitle("SynCoin")
-        }
-    }
-    
-    // MARK: - Récompenses
-    var rewardsTab: some View {
-        NavigationStack {
-            List {
-                Section("Olona") {
-                    HStack {
-                        Image(systemName: "gift.fill")
-                            .foregroundStyle(.yellow)
-                            .font(.title2)
-                        VStack(alignment: .leading) {
-                            Text("\(olona) Olona")
-                                .font(.title2.weight(.bold))
-                            Text("Gagne des Olona en contribuant du compute")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+            .font(.system(size: 13, weight: .bold, design: .monospaced))
+            .foregroundColor(.green)
+            .padding()
+            .border(Color.green, width: 1)
+            
+            // Terminal Logs
+            ScrollViewReader { proxy in
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 6) {
+                        ForEach(0..<node.logs.count, id: \.self) { index in
+                            Text(node.logs[index])
+                                .font(.system(size: 13, design: .monospaced))
+                                .foregroundColor(.green)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .id(index)
                         }
                     }
-                    .padding(.vertical, 4)
+                    .padding()
                 }
-                
-                Section("Actions") {
-                    ActionRow(icon: "tree.fill", color: .green, title: "Planter un arbre",
-                             subtitle: "50 Olona", disabled: olona < 50) {
-                        plantTree()
-                    }
-                    
-                    ActionRow(icon: "photo.on.rectangle.fill", color: .purple, title: "Mint un NFT",
-                             subtitle: "25 Olona", disabled: olona < 25) {
-                        mintNFT()
-                    }
-                    
-                    ActionRow(icon: "wifi", color: .blue, title: "Data gratuit",
-                             subtitle: "10 Olona/heure", disabled: olona < 10) {
-                        showAlert("Bientôt disponible")
+                .onChange(of: node.logs.count) { _ in
+                    withAnimation {
+                        proxy.scrollTo(node.logs.count - 1, anchor: .bottom)
                     }
                 }
             }
-            .navigationTitle("Récompenses")
-        }
-    }
-    
-    // MARK: - Forêt
-    var forestTab: some View {
-        NavigationStack {
-            List {
-                Section("Impact") {
-                    HStack {
-                        Image(systemName: "tree.fill")
-                            .foregroundStyle(.green)
-                            .font(.system(size: 48))
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("\(trees) arbres plantés")
-                                .font(.title2.weight(.bold))
-                            Text("via notre ASBL partenaire")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        .padding(.leading, 8)
-                    }
-                    .padding(.vertical, 8)
-                }
-                
-                if trees > 0 {
-                    Section("Statistiques") {
-                        ImpactRow(label: "CO₂ absorbé", value: "\(trees * 22) kg/an", icon: "cloud.fill", color: .blue)
-                        ImpactRow(label: "Oxygène produit", value: "\(trees * 118) kg/an", icon: "wind", color: .teal)
-                        ImpactRow(label: "Biodiversité", value: "\(trees * 10) espèces", icon: "leaf.fill", color: .green)
-                    }
-                }
-            }
-            .navigationTitle("Ma Forêt")
-        }
-    }
-    
-    // MARK: - Profil
-    var profileTab: some View {
-        NavigationStack {
-            List {
-                Section("Portefeuille") {
-                    HStack {
-                        Image(systemName: "person.circle.fill")
-                            .font(.system(size: 48))
-                            .foregroundStyle(.green)
-                        VStack(alignment: .leading) {
-                            Text("SynCoin User")
-                                .font(.headline)
-                            Text("ID: syncoin-\(UUID().uuidString.prefix(8))")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    }
-                }
-                
-                Section("NFTs") {
-                    if nfts == 0 {
-                        Text("Aucun NFT pour le moment")
-                            .foregroundStyle(.secondary)
-                            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            
+            // Wallet Info
+            Text("WALLET: \(node.solanaAddress)")
+                .font(.system(size: 10, design: .monospaced))
+                .foregroundColor(.green.opacity(0.7))
+                .padding(.bottom, 5)
+            
+            // Controls
+            HStack(spacing: 16) {
+                Button(action: {
+                    if node.isConnected {
+                        node.disconnect()
                     } else {
-                        ForEach(0..<nfts, id: \.self) { i in
-                            Label("NFT #\(i + 1)", systemImage: "photo.on.rectangle.fill")
-                        }
+                        node.connect()
                     }
+                }) {
+                    Text(node.isConnected ? "1. DISCONNECT" : "1. CONNECT_NODE")
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .foregroundColor(node.isConnected ? .black : .green)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(node.isConnected ? Color.green : Color.black)
+                        .border(Color.green, width: 1.5)
                 }
                 
-                Section("À propos") {
-                    Label("Version 0.1", systemImage: "info.circle")
-                    Label("Licence AGPL v3", systemImage: "doc.text")
-                    Label("Pour Lilo 💜", systemImage: "heart.fill")
+                Button(action: {
+                    node.toggleCompute()
+                }) {
+                    Text(node.isComputing ? "HALT_COMPUTE" : "2. START_COMPUTE")
+                        .font(.system(size: 14, weight: .bold, design: .monospaced))
+                        .foregroundColor(node.isComputing ? .black : .green)
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(node.isComputing ? Color.green : Color.black)
+                        .border(Color.green, width: 1.5)
                 }
+                .disabled(!node.isConnected)
+                .opacity(node.isConnected ? 1.0 : 0.5)
             }
-            .navigationTitle("Profil")
+            .padding()
         }
+        .background(Color.black.edgesIgnoringSafeArea(.all))
     }
-    
-    // MARK: - Actions
-    func toggleContribute() {
-        isContributing.toggle()
-        if isContributing {
-            compute += 10
-            olona += 1
-            alertMessage = "⚡ Contribution envoyée !"
-            showAlert = true
-        }
-    }
-    
-    func plantTree() {
-        guard olona >= 50 else { return }
-        olona -= 50
-        trees += 1
-        alertMessage = "🌱 Un arbre planté !"
-        showAlert = true
-    }
-    
-    func mintNFT() {
-        guard olona >= 25 else { return }
-        olona -= 25
-        nfts += 1
-        alertMessage = "🖼️ NFT minté !"
-        showAlert = true
-    }
-    
-    func showAlert(_ msg: String) {
-        alertMessage = msg
-        showAlert = true
-    }
-}
-
-// MARK: - Components
-struct StatCard: View {
-    let icon: String
-    let value: String
-    let label: String
-    let color: Color
-    
-    var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundStyle(color)
-            Text(value)
-                .font(.title.weight(.bold))
-            Text(label)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
-        .background(Color(.systemBackground))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-}
-
-struct ActionRow: View {
-    let icon: String
-    let color: Color
-    let title: String
-    let subtitle: String
-    let disabled: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        HStack {
-            Image(systemName: icon)
-                .foregroundStyle(color)
-                .font(.title2)
-                .frame(width: 32)
-            VStack(alignment: .leading) {
-                Text(title)
-                    .font(.body)
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
-            Button(action: action) {
-                Text("Faire")
-                    .font(.callout.weight(.semibold))
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(disabled ? Color(uiColor: .systemGray5) : color)
-                    .foregroundColor(disabled ? .secondary : .white)
-                    .clipShape(Capsule())
-            }
-            .disabled(disabled)
-        }
-        .padding(.vertical, 4)
-    }
-}
-
-struct ImpactRow: View {
-    let label: String
-    let value: String
-    let icon: String
-    let color: Color
-    
-    var body: some View {
-        HStack {
-            Image(systemName: icon)
-                .foregroundStyle(color)
-                .font(.title3)
-            Text(label)
-                .font(.body)
-            Spacer()
-            Text(value)
-                .font(.callout.weight(.semibold))
-                .foregroundStyle(color)
-        }
-    }
-}
-
-#Preview {
-    ContentView()
 }

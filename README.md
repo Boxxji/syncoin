@@ -15,7 +15,7 @@ SynCoin is a P2P compute network that transforms idle smartphone power into **fr
 
 ## Concept
 
-Your phone is powerful. When you're not using it, it does nothing. SynCoin uses a **small fraction of its power** (max 10% battery) to help the network.
+Your phone is powerful. When you're not using it, it does nothing. SynCoin uses a **small fraction of its power** (max 10% battery) to help the network compute complex tasks like **bioacoustic memory analysis (Zero-Supervision t-SNE on CETI data)**.
 
 In return, you receive:
 - 🎁 **Olona** — gift currency of the network

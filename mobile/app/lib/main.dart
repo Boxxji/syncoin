@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'rewards.dart';
-import 'forest.dart';
-import 'profile.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'dart:convert';
+import 'dart:async';
 
 void main() => runApp(const SynCoinApp());
 
@@ -11,163 +11,218 @@ class SynCoinApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SynCoin',
+      title: 'SynCoin CLI',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        brightness: Brightness.dark,
-        colorScheme: ColorScheme.dark(
-          primary: Color(0xFF4CAF50),
-          secondary: Color(0xFF81C784),
-          surface: Color(0xFF1C1C1E),
+        scaffoldBackgroundColor: Colors.black,
+        colorScheme: const ColorScheme.dark(
+          primary: Color(0xFF00FF00),
+          surface: Colors.black,
+          background: Colors.black,
         ),
-        useMaterial3: true,
-        fontFamily: 'SF Pro Display',
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(fontFamily: 'Courier', color: Color(0xFF00FF00), fontSize: 14),
+          bodyMedium: TextStyle(fontFamily: 'Courier', color: Color(0xFF00FF00), fontSize: 12),
+        ),
       ),
-      home: const MainScreen(),
+      home: const GrokTerminalScreen(),
     );
   }
 }
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+class GrokTerminalScreen extends StatefulWidget {
+  const GrokTerminalScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<GrokTerminalScreen> createState() => _GrokTerminalScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
-
-  static const List<Widget> _pages = <Widget>[
-    HomePage(),
-    RewardsPage(),
-    ForestPage(),
-    ProfilePage(),
+class _GrokTerminalScreenState extends State<GrokTerminalScreen> {
+  final List<String> _logs = [
+    "> SYNCOIN OS v0.2.0 INITIALIZED", 
+    "> BIOACOUSTIC T-SNE PROTOCOL LOADED",
+    "> SYSTEM STANDBY. AWAITING NODE CONNECTION..."
   ];
+  WebSocketChannel? _channel;
+  int _olona = 0;
+  int _computeCycles = 0;
+  bool _isConnected = false;
+  bool _isComputing = false;
+  Timer? _computeTimer;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) => setState(() => _selectedIndex = index),
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        indicatorColor: Color(0xFF4CAF50).withOpacity(0.2),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined, color: Colors.grey), selectedIcon: Icon(Icons.home, color: Color(0xFF4CAF50)), label: 'Accueil'),
-          NavigationDestination(icon: Icon(Icons.card_giftcard_outlined, color: Colors.grey), selectedIcon: Icon(Icons.card_giftcard, color: Color(0xFF4CAF50)), label: 'Récompenses'),
-          NavigationDestination(icon: Icon(Icons.forest_outlined, color: Colors.grey), selectedIcon: Icon(Icons.forest, color: Color(0xFF4CAF50)), label: 'Forêt'),
-          NavigationDestination(icon: Icon(Icons.person_outline, color: Colors.grey), selectedIcon: Icon(Icons.person, color: Color(0xFF4CAF50)), label: 'Profil'),
-        ],
-      ),
-    );
+  final ScrollController _scrollController = ScrollController();
+
+  void _addLog(String message) {
+    setState(() {
+      _logs.add("> $message");
+      if (_logs.length > 100) _logs.removeAt(0); // Keep last 100 logs
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
   }
-}
 
-// --- Pages ---
+  void _connect() {
+    try {
+      // Dans le futur, l'IP sera decouverte via DNS P2P
+      _channel = WebSocketChannel.connect(Uri.parse('ws://127.0.0.1:8766')); 
+      _addLog("CONNECTING TO SYNCOIN NETWORK [ws://127.0.0.1:8766]");
+      
+      _channel!.stream.listen(
+        (message) {
+          final data = jsonDecode(message);
+          if (data['status'] == 'ok' && data.containsKey('olona')) {
+            setState(() {
+              _olona += data['olona'] as int;
+            });
+            _addLog("COMPUTE ACCEPTED. REWARD: +${data['olona']} OLONA");
+          } else if (data['status'] == 'pong') {
+            setState(() => _isConnected = true);
+            _addLog("CONNECTION ESTABLISHED. NODE_ID: ${data['node']}");
+          } else {
+             _addLog("RECV: $message");
+          }
+        },
+        onDone: () {
+          setState(() {
+            _isConnected = false;
+            _isComputing = false;
+          });
+          _computeTimer?.cancel();
+          _addLog("CONNECTION CLOSED BY PEER.");
+        },
+        onError: (error) {
+          setState(() {
+            _isConnected = false;
+            _isComputing = false;
+          });
+          _computeTimer?.cancel();
+          _addLog("CONNECTION ERROR: $error");
+        },
+      );
+      
+      // Handshake initial
+      _channel!.sink.add(jsonEncode({"action": "ping"}));
+    } catch (e) {
+      _addLog("FAILED TO CONNECT: $e");
+    }
+  }
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  void _toggleCompute() {
+    if (!_isConnected) {
+      _addLog("ERROR: NOT CONNECTED TO NETWORK");
+      return;
+    }
+    setState(() {
+      _isComputing = !_isComputing;
+    });
+
+    if (_isComputing) {
+      _addLog("INITIATING BIOACOUSTIC T-SNE COMPUTE BATCH...");
+      _computeTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
+        final cycles = 15;
+        _channel!.sink.add(jsonEncode({"action": "compute", "cycles": cycles}));
+        setState(() => _computeCycles += cycles);
+        _addLog("TX: COMPUTE_BATCH [CYCLES: $cycles] [DIM: 128D]");
+      });
+    } else {
+      _computeTimer?.cancel();
+      _addLog("COMPUTE SEQUENCE TERMINATED BY USER.");
+    }
+  }
+
+  @override
+  void dispose() {
+    _channel?.sink.close();
+    _computeTimer?.cancel();
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('SynCoin', style: TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-      ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              const Spacer(flex: 2),
-              Icon(Icons.eco, size: 80, color: Color(0xFF4CAF50)),
-              const SizedBox(height: 16),
-              Text('SynCoin', style: theme.textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              Text("Prête ton téléphone. Reçois des cadeaux.",
-                   style: theme.textTheme.bodyLarge?.copyWith(color: Colors.grey)),
-              const Spacer(flex: 2),
-              _StatGrid(),
-              const Spacer(flex: 2),
-              SizedBox(
-                width: double.infinity, height: 56,
-                child: FilledButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.play_arrow),
-                  label: const Text('Contribuer maintenant', style: TextStyle(fontSize: 16)),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Color(0xFF4CAF50),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Status Bar (Top)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                border: Border(bottom: BorderSide(color: Color(0xFF00FF00), width: 1)),
               ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(Icons.battery_5_bar, size: 16, color: Colors.grey),
-                  const SizedBox(width: 4),
-                  Text('Max 10% batterie', style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey)),
-                  const SizedBox(width: 24),
-                  Icon(Icons.public, size: 16, color: Colors.grey),
-                  const SizedBox(width: 4),
-                  Text('For the common good', style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey)),
+                  Text("NET: ${_isConnected ? 'ONLINE' : 'OFFLINE'}", 
+                      style: const TextStyle(color: Color(0xFF00FF00), fontWeight: FontWeight.bold, fontFamily: 'Courier', fontSize: 13)),
+                  Text("OLONA: $_olona", 
+                      style: const TextStyle(color: Color(0xFF00FF00), fontWeight: FontWeight.bold, fontFamily: 'Courier', fontSize: 13)),
+                  Text("CYCLES: $_computeCycles", 
+                      style: const TextStyle(color: Color(0xFF00FF00), fontWeight: FontWeight.bold, fontFamily: 'Courier', fontSize: 13)),
                 ],
               ),
-              const Spacer(flex: 1),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
+            ),
+            
+            // Terminal View (Middle)
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                child: ListView.builder(
+                  controller: _scrollController,
+                  itemCount: _logs.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Text(_logs[index], style: const TextStyle(fontFamily: 'Courier', color: Color(0xFF00FF00), fontSize: 14)),
+                    );
+                  },
+                ),
+              ),
+            ),
 
-class _StatGrid extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _StatCard(icon: Icons.card_giftcard, value: '100', label: 'Olona', color: Colors.amber),
-        const SizedBox(width: 12),
-        _StatCard(icon: Icons.forest, value: '0', label: 'Arbres', color: Colors.green),
-        const SizedBox(width: 12),
-        _StatCard(icon: Icons.bolt, value: '0', label: 'Compute', color: Colors.blue),
-        const SizedBox(width: 12),
-        _StatCard(icon: Icons.image, value: '0', label: 'NFTs', color: Colors.purple),
-      ],
-    );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final IconData icon;
-  final String value;
-  final String label;
-  final Color color;
-
-  const _StatCard({required this.icon, required this.value, required this.label, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: color, size: 24),
-            const SizedBox(height: 4),
-            Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
-            Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+            // Controls (Bottom)
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFF00FF00), width: 1.5),
+                        backgroundColor: _isConnected ? Colors.black : const Color(0xFF002200),
+                        shape: const ContinuousRectangleBorder(),
+                        padding: const EdgeInsets.all(20)
+                      ),
+                      onPressed: _isConnected ? null : _connect,
+                      child: const Text("1. CONNECT_NODE", style: TextStyle(color: Color(0xFF00FF00), fontFamily: 'Courier', fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFF00FF00), width: 1.5),
+                        backgroundColor: _isComputing ? const Color(0xFF00FF00) : Colors.black,
+                        shape: const ContinuousRectangleBorder(),
+                        padding: const EdgeInsets.all(20)
+                      ),
+                      onPressed: _toggleCompute,
+                      child: Text(_isComputing ? "HALT_COMPUTE" : "2. START_COMPUTE", 
+                        style: TextStyle(
+                          color: _isComputing ? Colors.black : const Color(0xFF00FF00), 
+                          fontFamily: 'Courier', 
+                          fontWeight: FontWeight.bold
+                        )
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
