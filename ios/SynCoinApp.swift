@@ -88,8 +88,8 @@ class NodeConnection: ObservableObject {
     }
     
     func connect() {
-        guard let url = URL(string: "ws://192.168.1.220:8766") else { return }
-        addLog("CONNECTING TO SYNCOIN NETWORK [ws://192.168.1.220:8766]")
+        guard let url = URL(string: "ws://168.231.83.190:8766") else { return }
+        addLog("CONNECTING TO SYNCOIN NETWORK [ws://168.231.83.190:8766]")
         
         let session = URLSession(configuration: .default)
         webSocketTask = session.webSocketTask(with: url)
