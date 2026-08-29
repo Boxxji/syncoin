@@ -135,6 +135,7 @@ Unlike centralized cloud providers that retain 70-80% operating margins, **SynCo
 - 📱 [Native iOS App Guide (SwiftUI & Wasm3)](docs/app-ios.md)
 - 🤖 [Android Mobile App Guide (Flutter)](docs/app-android.md)
 - ☀️ [Solar & Home Battery (BESS) Integration Guide](docs/solar-batteries-guide.md)
+- ⚡ [Hardware Inference Capacity & Performance Benchmark](docs/benchmark-hardware-capacity.md)
 - 🌐 [OpenAI Gateway & Marketplace API Reference](docs/gateway-openai-api.md)
 - 🤗 [Free Public Mesh Hosting (Hugging Face / Nostr / WebRTC)](docs/public-mesh-hosting.md)
 - 🛡️ [Security, Privacy & Air-Gap Architecture Audit](docs/security-privacy-audit.md)
