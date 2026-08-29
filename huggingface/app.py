@@ -216,12 +216,16 @@ async def list_models():
 
 @app.post("/v1/chat/completions")
 async def chat_completions(request: Request):
-    body = await request.json()
+    try:
+        body = await request.json()
+    except Exception:
+        return JSONResponse(status_code=400, content={"error": {"message": "Invalid JSON body", "type": "invalid_request_error"}})
+
     model = body.get("model", "syncoin-green-slm")
     messages = body.get("messages", [])
     user_prompt = messages[-1].get("content", "") if messages else "Hello"
 
-    job_id = f"req-hf-{int(time.time()*1000)}"
+    job_id = f"req-hf-{time.time_ns()}-{hashlib.sha256(str(time.perf_counter_ns()).encode()).hexdigest()[:8]}"
     t0 = time.perf_counter()
 
     # Dispatch to connected worker if available (round-robin / energy-aware)
