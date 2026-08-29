@@ -109,22 +109,22 @@ class TestSynCoinDecarbonizedMesh(unittest.IsolatedAsyncioTestCase):
         # Attente du calcul et du renvoi du résultat
         await asyncio.sleep(0.8)
 
-        # 3. Vérification des résultats
+        # 3. Verify results
         self.assertEqual(worker.total_jobs_completed, 1)
         self.assertGreater(worker.total_olona_earned, 0.0)
         self.assertEqual(self.node.compute_shared, 1)
         self.assertGreater(self.node.olona, initial_olona)
-        log.info(f"🌱 Solde Olona après calcul : {self.node.olona:.2f} (+{self.node.olona - initial_olona:.2f})")
+        log.info(f"🌱 Olona balance after compute: {self.node.olona:.2f} (+{self.node.olona - initial_olona:.2f})")
 
-        # 4. Plantation d'arbre via ASBL (Burn d'Olona)
-        self.node.olona = 120.0  # Assure solde suffisant pour le test
+        # 4. Carbon offset / Certificate verification (50 Olona redeem)
+        self.node.olona = 120.0
         tree_res = self.node.plant_tree()
         self.assertIn("tree", tree_res)
         self.assertEqual(self.node.trees, 1)
         self.assertEqual(self.node.olona, 70.0)
-        log.info(f"🌳 Arbre planté avec succès ! Message: {tree_res['message']}")
+        log.info(f"🌱 Compute Certificate / Offset Verified! Message: {tree_res['message']}")
 
-        # Arrêt du worker
+        # Stop worker
         worker.is_running = False
         worker_task.cancel()
         try:
@@ -132,7 +132,7 @@ class TestSynCoinDecarbonizedMesh(unittest.IsolatedAsyncioTestCase):
         except asyncio.CancelledError:
             pass
 
-        log.info("✅ [TEST 2] Cycle End-to-End Validé à 100% !")
+        log.info("✅ [TEST 2] End-to-End Cycle 100% Validated!")
 
 
 if __name__ == "__main__":

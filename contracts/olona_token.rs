@@ -7,20 +7,20 @@ declare_id!("Fg6GsFp2z7Cz4v7e3v5dGq8hQh9UkNJLKpPqRrSsTtUv");
 pub mod olona_token {
     use super::*;
 
-    /// Distribuer des Olona a un contributeur
+    /// Distribute Olona rewards to a compute contributor
     pub fn reward(ctx: Context<Reward>, amount: u64) -> Result<()> {
         require!(amount > 0 && amount <= 1000, OlonaError::InvalidAmount);
         
         let contributor = &ctx.accounts.contributor;
         let olona_mint = &ctx.accounts.olona_mint;
         
-        // Verifier que le contributeur a prete du compute
+        // Verify that the contributor has provided compute cycles
         require!(ctx.accounts.compute_log.compute_shared > 0, OlonaError::NoCompute);
         
-        // Minage d Olona (simplifie)
+        // Mint Olona tokens
         let olona_amount = amount * 10_u64.pow(olona_mint.decimals as u32);
         
-        // Transferer les Olona
+        // Transfer Olona to contributor
         token::mint_to(
             CpiContext::new(
                 ctx.accounts.token_program.to_account_info(),
@@ -33,7 +33,7 @@ pub mod olona_token {
             olona_amount,
         )?;
         
-        // Enregistrer la transaction
+        // Record transaction
         let tx = &mut ctx.accounts.transaction;
         tx.contributor = contributor.key();
         tx.amount = olona_amount;
@@ -49,7 +49,7 @@ pub mod olona_token {
         Ok(())
     }
 
-    /// Planter un arbre (bruler des Olona)
+    /// Redeem compute certificate / carbon offset (burn Olona)
     pub fn plant_tree(ctx: Context<PlantTree>) -> Result<()> {
         let burn_amount = 50 * 10_u64.pow(ctx.accounts.olona_mint.decimals as u32);
         
@@ -145,10 +145,10 @@ pub struct TreePlanted {
 
 #[error_code]
 pub enum OlonaError {
-    #[msg("Pas assez d'Olona pour planter un arbre")]
+    #[msg("Insufficient Olona balance to redeem certificate")]
     InsufficientOlona,
-    #[msg("Montant invalide (1-1000 Olona)")]
+    #[msg("Invalid reward amount (1-1000 Olona)")]
     InvalidAmount,
-    #[msg("Aucun compute partage, contribuez d'abord")]
+    #[msg("No compute recorded, contribute green inference cycles first")]
     NoCompute,
 }

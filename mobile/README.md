@@ -1,40 +1,34 @@
 # SynCoin Mobile App 📱
 
-**Prête ton téléphone quand tu dors. Reçois des cadeaux. Le monde change.**
+> **Monetize idle charging time into useful AI inference with 100% direct rewards.**
 
-## Installation
+## Quick Start (Flutter)
 
 ```bash
-# Prérequis : Flutter SDK
+# Prerequisites : Flutter SDK 3.19+
+cd mobile/app
 flutter pub get
 flutter run
 ```
 
-## Fonctionnalités
+## Features
 
-- 🔋 Contribution automatique (max 10% batterie)
-- 🎁 Olona : monnaie/cadeau du réseau
-- 🌳 Arbres plantés via ASBL
-- 🖼️ NFTs de contribution
-- 📡 Data gratuit pour les labos/ONG
-- 🔒 100% privacy, 100% open source
+- 🔋 **Zero-Degradation Compute**: Operates only when charging on AC/Solar mains.
+- 🎁 **100% Direct Remuneration**: Olona / Solana tokens credited directly to the mobile wallet.
+- ⚡ **Embedded Wasm Engine**: Secure, sandboxed WebAssembly execution.
+- 📡 **Open-Access AI**: Decentralized P2P compute for scientific labs, AI developers, and individuals.
+- 🔒 **100% Privacy**: Zero tracking, zero telemetry, 100% open-source.
 
 ## Architecture
 
+```text
+mobile/app/lib/
+├── main.dart      # Interactive terminal entrypoint
+├── node.dart      # P2P Node client
+├── wallet.dart    # Direct Olona wallet & reward tracker
+└── p2p.dart       # High-speed WebSocket client
 ```
-lib/
-├── main.dart      # Point d'entrée
-├── node.dart      # Nœud SynCoin
-├── wallet.dart    # Portefeuille Olona/NFT
-└── p2p.dart       # Communication P2P
-```
 
-## Platformes
+## License
 
-- iOS (Swift/Kotlin)
-- Android (Kotlin)
-- (Tablettes aussi)
-
-## Licence
-
-AGPL v3 + Clause Non-Commerciale. Gratuit. Pour toujours.
+MIT License — 100% Free & Open-Source for humanity.

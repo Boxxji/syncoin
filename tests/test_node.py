@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tests unitaires SynCoin"""
+"""SynCoin Unit Test Suite — MIT License"""
 import sys, os, json, tempfile, unittest
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -8,48 +8,46 @@ import syncoin_node
 class TestSynCoinNode(unittest.TestCase):
     
     def setUp(self):
-        # Nettoyer le fichier de persistance pour eviter les interférences
+        # Clean persistence file to avoid cross-test interference
         if os.path.exists(syncoin_node.DATA_FILE):
             os.remove(syncoin_node.DATA_FILE)
         self.node = syncoin_node.SynCoinNode("test-node")
     
-    def test_creation_noeud(self):
-        """Test la création d'un nœud"""
+    def test_node_creation(self):
+        """Test node creation and default parameters"""
         self.assertIsNotNone(self.node.id)
         self.assertEqual(self.node.olona, 100)
         self.assertEqual(self.node.trees, 0)
         self.assertTrue(len(self.node.id) > 5)
     
     def test_contribution(self):
-        """Test la contribution de compute"""
+        """Test compute contribution and reward allocation"""
         result = self.node.contribute(100)
         self.assertEqual(self.node.compute_shared, 100)
         self.assertEqual(self.node.olona, 110)  # 100 + 10 reward
         self.assertIn('olona', result)
     
     def test_contribution_minimum(self):
-        """Test contribution minimum"""
+        """Test minimum contribution threshold"""
         result = self.node.contribute(1)
         self.assertEqual(result['olona'], 0)  # < 10 cycles = 0 olona
     
     def test_plant_tree(self):
-        """Test la plantation d'arbre"""
+        """Test certificate redemption and burning 50 Olona"""
         result = self.node.plant_tree()
         self.assertEqual(self.node.trees, 1)
         self.assertEqual(self.node.olona, 50)  # 100 - 50
     
     def test_plant_tree_insufficient(self):
-        """Test plantation sans assez d'Olona"""
-        # Depenser tous les Olona
+        """Test redemption with insufficient Olona balance"""
         for _ in range(10):
             if self.node.olona >= 50:
                 self.node.plant_tree()
-        # Plus assez
         result = self.node.plant_tree()
         self.assertIn('error', result)
     
     def test_claim_nft(self):
-        """Test le mint d'un NFT"""
+        """Test issuing proof-of-compute NFT certificate"""
         nft = self.node.claim_nft("gold")
         self.assertEqual(len(self.node.nfts), 1)
         self.assertEqual(nft['tier'], "gold")
@@ -57,7 +55,7 @@ class TestSynCoinNode(unittest.TestCase):
         self.assertIn('timestamp', nft)
     
     def test_multiple_nfts(self):
-        """Test le mint de plusieurs NFTs"""
+        """Test issuing multiple NFT certificates"""
         self.node.claim_nft("bronze")
         self.node.claim_nft("silver")
         self.node.claim_nft("gold")

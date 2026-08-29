@@ -104,14 +104,14 @@ class SynCoinNode:
             await asyncio.Future()  # Run forever
 
     async def dispatch_job(self, payload: str, job_id: Optional[str] = None):
-        """Distribue un job aux pairs connectés selon la priorité énergétique (Sun-Follower)"""
+        """Dispatches a job to connected peers according to solar/battery energy priority"""
         if not self.peers:
-            log.warning("⚠️ Aucun pair connecté pour exécuter le job.")
+            log.warning("⚠️ No peers connected to execute job.")
             return False
 
         job_id = job_id or f"job-{int(time.time() * 1000)}"
 
-        # Priorisation : 1. Pairs Solaire/Batterie -> 2. Pairs Secteur -> 3. Autres
+        # Prioritization: 1. Solar/Battery -> 2. Plugged AC Mains -> 3. Battery
         sorted_peers = sorted(
             self.peers.values(),
             key=lambda p: (
@@ -134,14 +134,14 @@ class SynCoinNode:
 
         try:
             await ws.send(json.dumps(msg))
-            log.info(f"🚀 Job [{job_id[:10]}] expédié au pair {peer_name} (Profil: {target_peer.get('green_tag', 'STANDARD')})")
+            log.info(f"🚀 Job [{job_id[:10]}] dispatched to peer {peer_name} (Profile: {target_peer.get('green_tag', 'STANDARD')})")
             return True
         except Exception as e:
-            log.error(f"❌ Échec d'envoi du job au pair {peer_name}: {e}")
+            log.error(f"❌ Failed to send job to peer {peer_name}: {e}")
             return False
 
     async def _handler(self, websocket):
-        """Gestionnaire des connexions WebSocket entrantes"""
+        """Inbound WebSocket connection handler"""
         peer_key = f"peer-{id(websocket)}"
         try:
             async for message in websocket:
@@ -152,7 +152,7 @@ class SynCoinNode:
 
                 action = data.get("action", "")
 
-                # 1. Enregistrement d'un pair (PC, Mac, iPhone, Android)
+                # 1. Peer registration (PC, Mac, iPhone, Android)
                 if action == "register":
                     node_name = data.get("node", peer_key)
                     power_info = data.get("power", {})
@@ -168,7 +168,7 @@ class SynCoinNode:
                         "green_tag": green_tag,
                         "registered_at": time.time()
                     }
-                    log.info(f"🤝 Pair enregistré: {node_name} [{data.get('device_type')}] (Alimentation: {green_tag}) | Total pairs: {len(self.peers)}")
+                    log.info(f"🤝 Peer registered: {node_name} [{data.get('device_type')}] (Power: {green_tag}) | Total peers: {len(self.peers)}")
                     await websocket.send(json.dumps({
                         "status": "registered",
                         "node": self.id,
@@ -176,7 +176,7 @@ class SynCoinNode:
                         "message": "Welcome to SynCoin Decarbonized Compute Mesh 🌱"
                     }))
 
-                # 2. Réception du résultat d'un calcul
+                # 2. Compute result receiving and settlement
                 elif action == "result":
                     job_id = data.get("job_id", "")
                     proof_hash = data.get("proof_hash", "")
@@ -189,11 +189,11 @@ class SynCoinNode:
                     _save_data(self)
 
                     log.info(
-                        f"✅ RÉSULTAT VALIDÉ pour [{job_id[:10]}] en {duration_ms:.2f}ms ! "
-                        f"Preuve SHA: {proof_hash[:12]}... | +{reward:.2f} Olona (Solde: {self.olona:.2f} 🌱)"
+                        f"✅ RESULT VERIFIED for [{job_id[:10]}] in {duration_ms:.2f}ms! "
+                        f"SHA Proof: {proof_hash[:12]}... | +{reward:.2f} Olona (Balance: {self.olona:.2f} 🌱)"
                     )
 
-                    # Publication de l'acquittement sur NATS si disponible
+                    # Publish acknowledgement to NATS if available
                     if self.nc:
                         try:
                             ack_payload = json.dumps({
@@ -205,7 +205,7 @@ class SynCoinNode:
                             }).encode("utf-8")
                             await self.nc.publish("syncoin.results", ack_payload)
                         except Exception as e:
-                            log.error(f"Erreur publication NATS results: {e}")
+                            log.error(f"Error publishing NATS results: {e}")
 
                     await websocket.send(json.dumps({
                         "status": "confirmed",
@@ -213,12 +213,12 @@ class SynCoinNode:
                         "olona_balance": self.olona
                     }))
 
-                # 3. Télémétrie énergétique directe par WebSocket
+                # 3. Direct energy telemetry over WebSocket
                 elif action == "energy_telemetry":
                     self.current_energy_state = data.get("state", {})
                     await websocket.send(json.dumps({"status": "energy_acknowledged"}))
 
-                # 4. Requête de stats & ping
+                # 4. Stats and ping requests
                 elif action == "ping":
                     await websocket.send(json.dumps({"status": "pong", "node": self.id, "peers_count": len(self.peers)}))
                 elif action == "stats":
@@ -230,10 +230,10 @@ class SynCoinNode:
             if peer_key in self.peers:
                 p_name = self.peers[peer_key].get("node", peer_key)
                 del self.peers[peer_key]
-                log.info(f"🔌 Pair déconnecté: {p_name} | Restants: {len(self.peers)}")
+                log.info(f"🔌 Peer disconnected: {p_name} | Remaining: {len(self.peers)}")
 
     def contribute(self, cycles: int = 10, inject_nan: bool = False) -> dict:
-        """Simulation locale de contribution de compute"""
+        """Local simulation of compute contribution"""
         reward = cycles // 10
         self.compute_shared += cycles
         self.olona += reward
@@ -241,7 +241,7 @@ class SynCoinNode:
         return {"cycles": cycles, "olona": reward, "total_olona": self.olona}
 
     def claim_nft(self, tier: str = "bronze") -> dict:
-        """Reçoit un NFT de contribution éco-citoyenne"""
+        """Issues an eco-citizen proof of compute certificate NFT"""
         nft = {
             "id": hashlib.sha256(f"{self.id}{tier}{time.time()}".encode()).hexdigest()[:12],
             "tier": tier,
@@ -254,13 +254,13 @@ class SynCoinNode:
         return nft
 
     def plant_tree(self):
-        """Burn 50 Olona pour planter un arbre via l'ASBL"""
+        """Burn 50 Olona to redeem a compute certificate / carbon offset"""
         if self.olona >= 50.0:
             self.olona -= 50.0
             self.trees += 1
             _save_data(self)
-            return {"tree": self.trees, "message": "🌱 Un arbre planté pour la planète"}
-        return {"error": "Pas assez d'Olona. Continuez à contribuer !"}
+            return {"tree": self.trees, "message": "🌱 Compute credit / Carbon offset verified"}
+        return {"error": "Not enough Olona. Continue contributing green compute!"}
 
     def stats(self):
         return {
