@@ -1,19 +1,19 @@
 # 🌐 SynCoin OpenAI-Compatible Inférence Gateway & Remuneration Marketplace
 
 > **Version** : v1.0.0 — MIT License  
-> **Base URL** : `http://localhost:8767` (or `http://168.231.83.190:8767` in Production)  
+> **Base URL** : `http://localhost:8767` (or public decentralized relay)  
 > **API Standard** : 100% Compatible OpenAI v1 Specification (`/v1/chat/completions`, `/v1/models`)
 
 ---
 
 ## 🌟 Overview
 
-The **SynCoin Inférence Gateway** acts as a decentralized compute marketplace. It allows companies, researchers, and developers to submit standard OpenAI API prompts while automatically routing them to green edge workers (Macs, PCs, iPhones, Android devices running on solar surplus or batteries).
+The **SynCoin Inférence Gateway** acts as a decentralized compute marketplace. It allows companies, researchers, and developers to submit standard OpenAI API prompts while automatically routing them across a free, open-source P2P mesh of green edge workers (Macs, PCs, iPhones, Android devices running on solar surplus or batteries).
 
 ### Key Highlights:
 - **70% Cheaper** than traditional hyperscaler clouds (AWS, GCP, Azure).
-- **Carbon-Negative & Sovereign**: Every request includes verified proof of green compute.
-- **Smart Remuneration (90/10 Split)**: 90% of token value goes directly to the solar/battery host, 10% funds real-world reforestation via our non-profit ASBL partner.
+- **Carbon-Negative & Sovereign**: Every request includes verified cryptographic proof of clean compute.
+- **100% Direct Remuneration**: 100% of token value goes directly to the solar/battery host with 0% intermediary deduction.
 
 ---
 
@@ -60,7 +60,7 @@ The **SynCoin Inférence Gateway** acts as a decentralized compute marketplace. 
   "messages": [
     {
       "role": "user",
-      "content": "Explain the concept of decentralized green AI in one sentence."
+      "content": "Explain how decentralized solar computing works in one sentence."
     }
   ]
 }
@@ -91,8 +91,8 @@ The **SynCoin Inférence Gateway** acts as a decentralized compute marketplace. 
   "syncoin_settlement": {
     "producer_worker_id": "worker-green-edge",
     "energy_source": "GREEN_SOLAR",
-    "worker_payout_olona": 0.207,
-    "asbl_trees_funded": 0.023,
+    "worker_payout_olona": 0.230,
+    "worker_payout_share": "100%",
     "inference_duration_ms": 50.62
   }
 }
@@ -107,10 +107,10 @@ The **SynCoin Inférence Gateway** acts as a decentralized compute marketplace. 
 ```json
 {
   "status": "online",
-  "mesh": "SynCoin Decarbonized Compute Mesh",
+  "mesh": "SynCoin Decarbonized Compute Mesh (100% Free & Open P2P)",
   "total_tokens_inferred": 145000,
   "total_olona_distributed": 725.50,
-  "total_trees_funded": 14.51,
+  "producer_revenue_share": "100%",
   "producers_count": 8,
   "producers": [
     {
@@ -134,7 +134,7 @@ from openai import OpenAI
 
 client = OpenAI(
     base_url="http://localhost:8767/v1",
-    api_key="syncoin-community-free" # Zero-friction access
+    api_key="syncoin-free-mesh"
 )
 
 response = client.chat.completions.create(
@@ -155,7 +155,7 @@ import OpenAI from "openai";
 
 const openai = new OpenAI({
   baseURL: "http://localhost:8767/v1",
-  apiKey: "syncoin-community-free",
+  apiKey: "syncoin-free-mesh",
 });
 
 async function main() {

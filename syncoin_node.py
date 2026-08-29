@@ -42,7 +42,7 @@ DATA_FILE = "syncoin_data.json"
 
 
 class SynCoinNode:
-    """Nœud P2P & Hub de Routage Énergétique SynCoin"""
+    """Universal P2P Node & Energy-Aware Job Dispatcher Hub"""
 
     def __init__(self, node_id: Optional[str] = None, port: int = 8766, nats_url: str = "nats://localhost:4222", data_file: Optional[str] = None):
         self.id = node_id or hashlib.sha256(str(time.time()).encode()).hexdigest()[:16]
@@ -52,7 +52,7 @@ class SynCoinNode:
         self.peers: Dict[str, dict] = {}  # {peer_id: {ws, node, power, green_tag, registered_at}}
         self.olona = 100.0
         self.nfts = []
-        self.trees = 0
+        self.trees = 0  # [ARCHANGE-AMPUTATION-PREVENTION: preserved for backward-compatibility]
         self.compute_shared = 0
         self.current_energy_state = {
             "energy_source_tag": "GREEN_SOLAR",
@@ -64,42 +64,42 @@ class SynCoinNode:
         _load_data(self)
 
     async def start(self):
-        """Démarre le nœud P2P et l'écoute NATS"""
-        log.info(f"🚀 Nœud SynCoin [{self.id[:8]}] écoute sur le port {self.port} (WebSocket)")
+        """Starts the P2P WebSocket server and NATS message subscriber"""
+        log.info(f"🚀 SynCoin Node [{self.id[:8]}] listening on port {self.port} (WebSocket P2P)")
 
-        # 1. Connexion NATS
+        # 1. Connect to NATS if available
         if nats is not None:
             try:
                 self.nc = await nats.connect(self.nats_url)
-                log.info(f"📡 Connecté à NATS sur {self.nats_url}")
+                log.info(f"📡 Connected to NATS broker: {self.nats_url}")
 
-                # Handler pour les jobs de calcul entrant
+                # Handler for incoming compute jobs
                 async def nats_job_handler(msg):
                     subject = msg.subject
                     data = msg.data.decode("utf-8", errors="replace")
-                    log.info(f"📩 NATS Job Reçu ({subject}): {data[:50]}...")
+                    log.info(f"📩 NATS Compute Job Received ({subject}): {data[:50]}...")
                     await self.dispatch_job(data)
 
-                # Handler pour la télémétrie énergétique Solaire / Batterie
+                # Handler for solar & battery telemetry
                 async def nats_energy_handler(msg):
                     try:
                         data = json.loads(msg.data.decode())
                         self.current_energy_state = data
                         tag = data.get("energy_source_tag", "UNKNOWN")
                         allow = data.get("compute_allowed", True)
-                        log.info(f"⚡ Télémétrie Énergétique NATS: {tag} (Compute: {'🟢 AUTORISÉ' if allow else '🔴 PAUSE'})")
+                        log.info(f"⚡ Solar/Battery Telemetry: {tag} (Compute: {'🟢 ALLOWED' if allow else '🔴 PAUSED'})")
                     except Exception as e:
-                        log.error(f"Erreur parsing télémétrie: {e}")
+                        log.error(f"Error parsing energy telemetry: {e}")
 
                 await self.nc.subscribe("syncoin.jobs", cb=nats_job_handler)
                 await self.nc.subscribe("syncoin.telemetry.energy", cb=nats_energy_handler)
 
             except Exception as e:
-                log.warning(f"⚠️ NATS non disponible ({e}) — fonctionnement en WebSocket pur")
+                log.warning(f"⚠️ NATS broker offline ({e}) — operating in standalone WebSocket P2P mode")
         else:
-            log.warning("⚠️ Module nats-py absent — fonctionnement en WebSocket pur")
+            log.warning("⚠️ Module nats-py not installed — operating in standalone WebSocket P2P mode")
 
-        # 2. Serveur WebSocket
+        # 2. Start WebSocket P2P Server
         async with websockets.serve(self._handler, "0.0.0.0", self.port):
             await asyncio.Future()  # Run forever
 

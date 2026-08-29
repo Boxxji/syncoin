@@ -65,9 +65,9 @@ class EnergyArbiter:
             return
         try:
             self.nc = await nats.connect(self.nats_url)
-            log.info(f"📡 Connecté à NATS pour la télémétrie énergétique : {self.nats_url}")
+            log.info(f"📡 Connected to NATS broker for energy telemetry: {self.nats_url}")
         except Exception as e:
-            log.warning(f"⚠️ Connexion NATS impossible ({e}) — télémétrie locale uniquement")
+            log.warning(f"⚠️ NATS connection failed ({e}) — local telemetry only")
             self.nc = None
 
     def evaluate_energy(
@@ -84,17 +84,17 @@ class EnergyArbiter:
         target_compute_w = 0.0
         tag = "PAUSED"
 
-        # 1. Priorité Solaire Direct (Surplus suffisant)
+        # 1. Direct Solar Priority (Sufficient surplus)
         if surplus >= self.min_surplus:
             compute_allowed = True
             target_compute_w = surplus
             tag = "GREEN_SOLAR"
-        # 2. Arbitrage Batterie Verte (Batterie bien chargée > 80% ou en surplus)
+        # 2. Green Battery Arbitrage (Battery well charged > 80%)
         elif battery_soc >= self.green_soc and battery_soc > self.min_soc_reserve:
             compute_allowed = True
             target_compute_w = min(500.0, (battery_soc - self.min_soc_reserve) * 10)
             tag = "GREEN_BATTERY"
-        # 3. Batterie sous le seuil de réserve vital (Protection de la maison)
+        # 3. Battery below emergency reserve (Home protection)
         elif battery_soc <= self.min_soc_reserve:
             compute_allowed = False
             target_compute_w = 0.0
@@ -106,22 +106,23 @@ class EnergyArbiter:
 
         return EnergyState(
             timestamp=now,
-            solar_power_watts=solar_w,
-            home_consumption_watts=home_w,
-            battery_soc_percent=battery_soc,
-            battery_power_watts=battery_power_w,
-            grid_power_watts=grid_w,
-            surplus_watts=surplus,
+            solar_power_watts=round(solar_w, 2),
+            home_consumption_watts=round(home_w, 2),
+            battery_soc_percent=round(battery_soc, 2),
+            battery_power_watts=round(battery_power_w, 2),
+            grid_power_watts=round(grid_w, 2),
+            surplus_watts=round(surplus, 2),
             compute_allowed=compute_allowed,
-            compute_power_target_watts=target_compute_w,
+            compute_power_target_watts=round(target_compute_w, 2),
             energy_source_tag=tag
         )
 
-    async def broadcast_state(self, state: EnergyState):
+    async def publish_telemetry(self, state: EnergyState):
         log.info(
-            f"⚡ [Solaire: {state.solar_power_watts:.0f}W | Maison: {state.home_consumption_watts:.0f}W | "
-            f"Batterie: {state.battery_soc_percent:.1f}%] ➔ Arbitrage: {state.energy_source_tag} "
-            f"(Compute: {'🟢 ON ' + str(int(state.compute_power_target_watts)) + 'W' if state.compute_allowed else '🔴 OFF'})"
+            f"⚡ [Telemetry] Solar: {state.solar_power_watts}W | "
+            f"Home: {state.home_consumption_watts}W | Surplus: {state.surplus_watts}W | "
+            f"Battery: {state.battery_soc_percent}% | Tag: {state.energy_source_tag} | "
+            f"Compute: {'🟢 ALLOWED' if state.compute_allowed else '🔴 PAUSED'}"
         )
         if self.nc:
             try:

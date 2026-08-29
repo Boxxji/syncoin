@@ -29,9 +29,8 @@ logging.basicConfig(
 log = logging.getLogger("SynCoinGateway")
 
 PORT = 8767
-# Taux de rémunération : 0.02 Olona par token généré (90% au producteur, 10% ASBL Arbres)
-WORKER_REVENUE_SHARE = 0.90
-ASBL_REVENUE_SHARE = 0.10
+# Remuneration Rate: 100% direct payout to the compute producer (0% intermediary fees)
+WORKER_REVENUE_SHARE = 1.00
 
 
 class InferenceMarketplace:
@@ -42,13 +41,11 @@ class InferenceMarketplace:
         self.pending_requests: Dict[str, asyncio.Future] = {}
         self.total_tokens_inferred = 0
         self.total_olona_distributed = 0.0
-        self.total_trees_funded = 0
         self.producer_ledgers: Dict[str, dict] = {} # {worker_id: {"olona": 0.0, "jobs": 0, "energy": "SOLAR"}}
 
     async def connect_nats(self):
         import socket
         if nats is not None and self.nats_url:
-            # Vérification de port rapide pour éviter les exceptions de transport asynchrones
             host = "127.0.0.1"
             port = 4222
             try:
@@ -57,7 +54,7 @@ class InferenceMarketplace:
                 res = s.connect_ex((host, port))
                 s.close()
                 if res != 0:
-                    log.warning(f"⚠️ Serveur NATS ({host}:{port}) inaccessible — fonctionnement en mode direct autonome")
+                    log.warning(f"⚠️ NATS Server ({host}:{port}) offline — running in standalone direct mode")
                     self.nc = None
                     return
             except Exception:
@@ -71,9 +68,8 @@ class InferenceMarketplace:
                     max_reconnect_attempts=0,
                     allow_reconnect=False
                 )
-                log.info(f"📡 Gateway reliée à NATS : {self.nats_url}")
+                log.info(f"📡 Gateway linked to NATS: {self.nats_url}")
 
-                # Écoute des résultats retournés par les workers
                 async def result_listener(msg):
                     try:
                         data = json.loads(msg.data.decode())
@@ -83,20 +79,19 @@ class InferenceMarketplace:
                             if not fut.done():
                                 fut.set_result(data)
                     except Exception as e:
-                        log.error(f"Erreur réception résultat: {e}")
+                        log.error(f"Error receiving result: {e}")
 
                 await self.nc.subscribe("syncoin.results", cb=result_listener)
             except Exception as e:
-                log.warning(f"⚠️ NATS non disponible ({e}) — fonctionnement en mode autonome immédiat")
+                log.warning(f"⚠️ NATS unavailable ({e}) — running in standalone mode")
                 self.nc = None
         else:
             self.nc = None
 
     def register_producer_payout(self, worker_id: str, tokens_count: int, energy_tag: str) -> dict:
-        """Calcule et crédite la rémunération du producteur d'inférence"""
+        """Calculate and credit 100% of the inference fee directly to the producer"""
         total_payout_olona = (tokens_count / 100.0) * 0.5  # 0.5 Olona / 100 tokens
         worker_payout = total_payout_olona * WORKER_REVENUE_SHARE
-        asbl_payout = total_payout_olona * ASBL_REVENUE_SHARE
 
         if worker_id not in self.producer_ledgers:
             self.producer_ledgers[worker_id] = {
@@ -112,18 +107,13 @@ class InferenceMarketplace:
         self.total_tokens_inferred += tokens_count
         self.total_olona_distributed += worker_payout
 
-        # Conversion d'arbres
-        trees_from_share = asbl_payout / 50.0
-        self.total_trees_funded += trees_from_share
-
         log.info(
-            f"💵 RÉMUNÉRATION VERSÉE ➔ {worker_id}: +{worker_payout:.3f} Olona "
-            f"({tokens_count} tokens | Énergie: {energy_tag}) | 🌲 ASBL: +{asbl_payout:.3f} Olona"
+            f"💵 DIRECT PAYOUT ➔ {worker_id}: +{worker_payout:.3f} Olona "
+            f"({tokens_count} tokens | Energy: {energy_tag} | 100% Direct Payout)"
         )
 
         return {
             "worker_payout_olona": round(worker_payout, 4),
-            "asbl_payout_olona": round(asbl_payout, 4),
             "worker_balance": round(self.producer_ledgers[worker_id]["total_olona"], 4)
         }
 
@@ -240,7 +230,7 @@ async def handle_chat_completions(request: web.Request) -> web.Response:
             "producer_worker_id": worker_id,
             "energy_source": energy_tag,
             "worker_payout_olona": payout["worker_payout_olona"],
-            "asbl_trees_funded": payout["asbl_payout_olona"],
+            "worker_payout_share": "100%",
             "inference_duration_ms": round(duration * 1000, 2)
         }
     }
@@ -249,13 +239,13 @@ async def handle_chat_completions(request: web.Request) -> web.Response:
 
 
 async def handle_marketplace_stats(request: web.Request) -> web.Response:
-    """GET /v1/marketplace/stats — Statistiques en direct des gains et tokens"""
+    """GET /v1/marketplace/stats — Real-time mesh and payout statistics"""
     return web.json_response({
         "status": "online",
-        "mesh": "SynCoin Decarbonized Compute Mesh",
+        "mesh": "SynCoin Decarbonized Compute Mesh (100% Free & Open P2P)",
         "total_tokens_inferred": marketplace.total_tokens_inferred,
         "total_olona_distributed": round(marketplace.total_olona_distributed, 2),
-        "total_trees_funded": round(marketplace.total_trees_funded, 3),
+        "producer_revenue_share": "100%",
         "producers_count": len(marketplace.producer_ledgers),
         "producers": list(marketplace.producer_ledgers.values())
     })

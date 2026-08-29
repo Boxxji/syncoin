@@ -50,7 +50,7 @@ class SynCoinWorker:
         self.total_olona_earned = 0.0
 
     def get_power_status(self) -> dict:
-        """Inspecte la batterie et l'alimentation secteur locale"""
+        """Inspects local battery and AC mains power status"""
         if psutil and hasattr(psutil, "sensors_battery"):
             batt = psutil.sensors_battery()
             if batt is not None:
@@ -60,7 +60,7 @@ class SynCoinWorker:
                     "power_plugged": batt.power_plugged,
                     "status": "CHARGING" if batt.power_plugged else "BATTERY"
                 }
-        # Desktops, serveurs ou systèmes sans batterie
+        # Desktops, servers or systems without internal battery
         return {
             "has_battery": False,
             "percent": 100.0,
@@ -69,18 +69,16 @@ class SynCoinWorker:
         }
 
     def execute_compute_payload(self, payload_b64: str) -> tuple[str, str, float]:
-        """Exécute la tâche de calcul et retourne (hash_preuve, résultat, temps_ms)"""
+        """Executes compute micro-job and returns (proof_hash, result, duration_ms)"""
         t0 = time.perf_counter()
         try:
             raw_bytes = base64.b64decode(payload_b64)
         except Exception:
             raw_bytes = payload_b64.encode("utf-8")
 
-        # Exécution de calcul utile (Simulation WASM ou exécution native)
-        # Calcul cryptographique & vectoriel sécurisé
+        # Deterministic compute and hashing work loop
         hasher = hashlib.sha256()
         hasher.update(raw_bytes)
-        # Boucle de travail mathématique déterministe
         for i in range(1000):
             hasher.update(i.to_bytes(4, "big"))
 
@@ -90,15 +88,15 @@ class SynCoinWorker:
         return proof_hash, output_data, dt_ms
 
     async def run(self):
-        log.info(f"🌱 Démarrage du Worker SynCoin [{self.worker_id}]...")
-        log.info(f"🔌 Cible Hub : {self.server_uri}")
+        log.info(f"🌱 Starting SynCoin Worker [{self.worker_id}]...")
+        log.info(f"🔌 Target Hub: {self.server_uri}")
 
         while self.is_running:
             try:
                 async with websockets.connect(self.server_uri) as ws:
-                    log.info("✅ Connecté au Nœud SynCoin !")
+                    log.info("✅ Connected to SynCoin Hub!")
                     
-                    # 1. Enregistrement avec statut énergétique
+                    # 1. Register with power profile
                     power = self.get_power_status()
                     reg_payload = {
                         "action": "register",
@@ -109,9 +107,9 @@ class SynCoinWorker:
                         "timestamp": time.time()
                     }
                     await ws.send(json.dumps(reg_payload))
-                    log.info(f"📋 Enregistré avec profil énergétique : {power['status']} ({power['percent']}%)")
+                    log.info(f"📋 Registered with energy profile: {power['status']} ({power['percent']}%)")
 
-                    # 2. Boucle de réception de jobs
+                    # 2. Job reception loop
                     async for msg in ws:
                         try:
                             data = json.loads(msg)
@@ -124,10 +122,10 @@ class SynCoinWorker:
                             payload = data.get("payload", "")
                             job_id = data.get("job_id", f"job-{int(time.time()*1000)}")
                             
-                            # Vérification du garde-fou d'alimentation
+                            # Power safeguard check
                             current_power = self.get_power_status()
                             if self.require_ac_power and current_power.get("has_battery") and not current_power.get("power_plugged"):
-                                log.warning("🛑 Batterie débranchée — calcul refusé pour préserver l'appareil")
+                                log.warning("🛑 Battery unplugged — job rejected to protect device lifespan")
                                 await ws.send(json.dumps({
                                     "action": "job_rejected",
                                     "job_id": job_id,
@@ -135,14 +133,14 @@ class SynCoinWorker:
                                 }))
                                 continue
 
-                            log.info(f"⚙️ Exécution du Job [{job_id[:12]}]...")
+                            log.info(f"⚙️ Executing Job [{job_id[:12]}]...")
                             proof_hash, output_data, duration_ms = self.execute_compute_payload(payload)
                             
-                            reward = 0.05  # 0.05 Olona par micro-lot
+                            reward = 0.05  # 0.05 Olona per micro-batch
                             self.total_jobs_completed += 1
                             self.total_olona_earned += reward
 
-                            # Renvoi du résultat avec preuve
+                            # Send back result and cryptographic proof
                             res_msg = {
                                 "action": "result",
                                 "node": self.worker_id,
@@ -156,8 +154,8 @@ class SynCoinWorker:
                             }
                             await ws.send(json.dumps(res_msg))
                             log.info(
-                                f"🎉 Job [{job_id[:12]}] complété en {duration_ms:.2f}ms ! "
-                                f"Preuve: {proof_hash[:10]}... | Total Olona: {self.total_olona_earned:.2f} 🌱"
+                                f"🎉 Job [{job_id[:12]}] completed in {duration_ms:.2f}ms! "
+                                f"Proof: {proof_hash[:10]}... | Total Olona: {self.total_olona_earned:.2f} 🌱"
                             )
 
                         elif action == "ping":
@@ -165,10 +163,10 @@ class SynCoinWorker:
 
             except (websockets.ConnectionClosed, ConnectionRefusedError, OSError) as e:
                 if self.is_running:
-                    log.warning(f"Connexion perdue ({e}), nouvelle tentative dans 3s...")
+                    log.warning(f"Connection lost ({e}), reconnecting in 3s...")
                     await asyncio.sleep(3.0)
             except Exception as e:
-                log.error(f"Erreur inattendue: {e}")
+                log.error(f"Unexpected error: {e}")
                 await asyncio.sleep(3.0)
 
 

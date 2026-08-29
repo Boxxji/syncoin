@@ -1,53 +1,62 @@
-SynCoin-OS/ (v1.0.0 — MIT License)
-├── README.md                      # Présentation complète, documentation & guides
-├── LICENSE                        # Licence MIT (100% Libre & Gratuit)
-├── CODE_OF_CONDUCT.md             # Règles de la communauté & éthique verte
-├── CONTRIBUTING.md                # Guide de contribution open source
-├── requirements.txt               # Dépendances Python légères (websockets, nats-py, aiohttp)
-├── docker-compose.yml             # Déploiement multi-services (Hub + NATS)
-├── Dockerfile                     # Image Docker du Nœud SynCoin
+# SynCoin-OS File Structure (v1.0.0 — MIT License)
+
+```text
+SynCoin-OS/
+├── README.md                      # Comprehensive project overview, quickstart & benchmarks
+├── LICENSE                        # Standard MIT License (100% Free & Open-Source)
+├── CODE_OF_CONDUCT.md             # Community standards & green compute ethics
+├── CONTRIBUTING.md                # Open-source contribution guidelines
+├── requirements.txt               # Lightweight Python dependencies (websockets, aiohttp, nats-py)
+├── docker-compose.yml             # Multi-service deployment (Hub Node + NATS Event Broker)
+├── Dockerfile                     # Docker container image for SynCoin Node
 │
 ├── 🧠 CORE NETWORK & DISPATCHING
-│   ├── syncoin_node.py            # Nœud P2P & Hub WebSocket/NATS (Sun-Follower Priority)
-│   ├── syncoin_gateway.py         # Gateway REST OpenAI-Compatible (:8767) & Remuneration Marketplace
-│   ├── syncoin_energy_daemon.py   # Arbitre Solaire & Batteries Résidentielles (BESS)
-│   └── syncoin_worker.py          # Client Worker Universel CLI multi-plateforme
+│   ├── syncoin_node.py            # P2P Node Hub (WebSocket :8766 / NATS :4222 / Sun-Follower Routing)
+│   ├── syncoin_gateway.py         # OpenAI-Compatible REST Gateway (:8767) & Remuneration Marketplace
+│   ├── syncoin_energy_daemon.py   # Solar & Battery BESS Arbiter (MQTT / Modbus / Home Assistant)
+│   └── syncoin_worker.py          # Universal CLI Compute Worker (Cross-platform Python)
 │
-├── 🖥️ APPLICATIONS DESKTOP (macOS & Windows PC)
+├── 🖥️ DESKTOP APPLICATIONS (macOS & Windows PC)
 │   └── desktop/
-│       ├── desktop_app.py         # Application GUI Bureau complète (Tkinter dark theme)
-│       └── package_desktop.py     # Script de build d'exécutable autonome (.app / .exe)
+│       ├── desktop_app.py         # Graphical Desktop App (Tkinter Dark Mode, Solar Gauges, Direct Payout)
+│       └── package_desktop.py     # Standalone binary compiler (.app on Mac / .exe on Windows)
 │
-├── 📱 APPLICATION NATIVE iOS (iPhone & iPad)
+├── 📱 NATIVE iOS APPLICATION (iPhone & iPad)
 │   └── ios/
-│       ├── SynCoinApp.swift       # Application native SwiftUI avec monitoring en direct
-│       ├── WasmEngine.swift       # Moteur WebAssembly Wasm3 pour calculs locaux
-│       ├── SynCoin.xcodeproj/     # Projet Xcode complet
-│       └── wasm3/                 # Interpréteur WebAssembly embarqué en C
+│       ├── SynCoinApp.swift       # Native SwiftUI App with real-time compute telemetry
+│       ├── WasmEngine.swift       # Embedded C Wasm3 runtime wrapper for neural micro-jobs
+│       ├── SynCoin.xcodeproj/     # Complete Xcode project ready to build and run
+│       └── wasm3/                 # Embedded C WebAssembly engine
 │
-├── 🤖 APPLICATION MOBILE ANDROID (Flutter / Dart)
+├── 🤖 ANDROID MOBILE APPLICATION (Flutter / Dart)
 │   └── mobile/
 │       └── app/
 │           ├── lib/
-│           │   ├── main.dart      # Application Flutter pour Android avec terminal et jauges
-│           │   ├── wallet.dart    # Gestionnaire de portefeuille Olona & gains
-│           │   └── p2p.dart       # Client WebSocket mobile
+│           │   ├── main.dart      # Flutter Application for Android with real-time terminal & gauges
+│           │   ├── wallet.dart    # Direct Olona & Solana rewards wallet manager
+│           │   └── p2p.dart       # High-speed WebSocket client
 │           └── pubspec.yaml
 │
-├── 📜 SMART CONTRACTS SOLANA (Rémunération & Écologie)
+├── 📜 SMART CONTRACTS SOLANA (Direct Rewards & Value Ledger)
 │   └── contracts/
-│       ├── olona_token.rs         # Token de récompense Anchor/Rust
-│       └── nft_mint.rs            # Certificats de contribution décarbonée
+│       ├── olona_token.rs         # Direct reward minting & compute proof settlement (Anchor/Rust)
+│       └── nft_mint.rs            # Decarbonized contribution certificates
 │
-├── 🧪 SUITE DE TESTS AUTOMATISÉS
+├── 🧪 AUTOMATED TEST SUITE
 │   └── tests/
-│       ├── test_node.py           # Tests unitaires du nœud historique
-│       └── test_syncoin_e2e.py    # Test End-to-End validant le cycle complet (16/16 OK)
+│       ├── test_node.py           # Unit tests for P2P WebSocket protocol
+│       └── test_syncoin_e2e.py    # End-to-End integration suite (Arbiter -> Node -> Worker -> Gateway)
 │
-└── 📚 DOCUMENTATION & SPÉCIFICATIONS
+└── 📚 COMPREHENSIVE DOCUMENTATION SUITE (100% English)
     └── docs/
-        ├── index.html             # Landing page interactive
-        ├── architecture.md        # Architecture Neocloud et topologie mesh
-        ├── economie.md            # Modèle économique de redistribution (90/10)
-        └── whitepaper.md          # Livre blanc SynCoin
-
+        ├── app-macos-windows.md   # Desktop App installation, GUI features & binary packaging
+        ├── app-ios.md             # iOS Native app guide, Wasm3 engine & charging safeguards
+        ├── app-android.md         # Android Flutter guide, APK compilation & background tasks
+        ├── solar-batteries-guide.md # Residential solar & BESS inverter setup (Tesla, Enphase, Victron)
+        ├── gateway-openai-api.md  # Complete OpenAI REST API specs, SDK code samples & 100% payout model
+        ├── architecture.md        # System architecture, top-tier topologies & Sun-Follower routing
+        ├── economie.md            # Economic analysis, ROI payback reduction (1.9 years) & token math
+        ├── whitepaper.md          # Official SynCoin Whitepaper v1.0
+        ├── installation.md        # 1-minute quickstart deployment guide
+        └── index.html             # Interactive HTML documentation portal
+```
