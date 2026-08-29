@@ -16,6 +16,13 @@ SynCoin-OS/
 │   ├── syncoin_energy_daemon.py   # Solar & Battery BESS Arbiter (MQTT / Modbus / Home Assistant)
 │   └── syncoin_worker.py          # Universal CLI Compute Worker (Cross-platform Python)
 │
+├── 🤗 FREE HUGGING FACE SPACE HUB (1-Click Cloud Deployment)
+│   └── huggingface/
+│       ├── app.py                 # Standalone FastAPI Hub, OpenAI Gateway & Dashboard (Port 7860)
+│       ├── Dockerfile             # Container definition for free 24/7 Hugging Face Space
+│       ├── requirements.txt       # Dependencies
+│       └── README.md              # Space YAML configuration & 1-click duplicate guide
+│
 ├── 🖥️ DESKTOP APPLICATIONS (macOS & Windows PC)
 │   └── desktop/
 │       ├── desktop_app.py         # Graphical Desktop App (Tkinter Dark Mode, Solar Gauges, Direct Payout)

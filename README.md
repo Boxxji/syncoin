@@ -64,7 +64,8 @@ graph TD
 | **Windows PC (Nvidia & AMD)** | Graphical GUI Desktop | Nvidia CUDA / ROCm / Vulkan | [`desktop/desktop_app.py`](desktop/desktop_app.py) |
 | **iOS (iPhone & iPad)** | Native SwiftUI App | Embedded C Wasm3 Interpreter | [`ios/SynCoinApp.swift`](ios/SynCoinApp.swift) |
 | **Android (Smartphone & Tablet)** | Material 3 Flutter App | Dart P2P / Wasm Sandbox | [`mobile/app/lib/main.dart`](mobile/app/lib/main.dart) |
-| **Enterprise / Cloud Gateway** | REST API (:8767) | OpenAI v1 Spec (`/v1/chat/completions`) | [`syncoin_gateway.py`](syncoin_gateway.py) |
+| **🤗 Free Hugging Face Space Hub** | 1-Click Cloud Hub | Free 24/7 Docker Hub & Gateway | [`huggingface/`](huggingface/) |
+| **Enterprise / Local Gateway** | REST API (:8767) | OpenAI v1 Spec (`/v1/chat/completions`) | [`syncoin_gateway.py`](syncoin_gateway.py) |
 
 ---
 
@@ -135,6 +136,7 @@ Unlike centralized cloud providers that retain 70-80% operating margins, **SynCo
 - 🤖 [Android Mobile App Guide (Flutter)](docs/app-android.md)
 - ☀️ [Solar & Home Battery (BESS) Integration Guide](docs/solar-batteries-guide.md)
 - 🌐 [OpenAI Gateway & Marketplace API Reference](docs/gateway-openai-api.md)
+- 🤗 [Free Public Mesh Hosting (Hugging Face / Nostr / WebRTC)](docs/public-mesh-hosting.md)
 - 🏛️ [System Architecture & Topologies](docs/architecture.md)
 - 💰 [Economic Payback & Token Mechanics](docs/economie.md)
 - 📜 [SynCoin Whitepaper v1.0](docs/whitepaper.md)

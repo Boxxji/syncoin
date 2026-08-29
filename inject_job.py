@@ -2,20 +2,23 @@ import asyncio
 import nats
 import json
 
-async def main():
+import os
+import nats
+
+async def send_job():
+    nats_url = os.environ.get("NATS_URL", "nats://localhost:4222")
     try:
-        nc = await nats.connect('nats://168.231.83.190:4222')
-        payload = 'AGFzbQEAAAABBQFgAAF/AwIBAAcNAQl0ZXN0X2hhc2gAAAoGAQQAQSoL'
-        # The payload must be valid JSON as per node expectations
-        # No, wait, the NATS handler expects 'msg.data.decode()' to be passed as 'data' in json.dumps
-        # Wait, the node's nats_handler does: data = msg.data.decode(); await ws.send(json.dumps({"action": "execute_wasm", "payload": data}))
-        # Therefore, 'data' should just be the base64 string!
-        
-        await nc.publish('syncoin.jobs', payload.encode())
-        print('✅ Job WASM injecté dans NATS avec succès !')
+        nc = await nats.connect(nats_url)
+        payload = json.dumps({
+            "action": "execute_wasm",
+            "job_id": "job-external-demo-001",
+            "payload": "SGVsbG8gU3luQ29pbiBPcGVuIE1lc2ggIQ=="
+        })
+        await nc.publish("syncoin.jobs", payload.encode())
+        print(f"✅ Job published to NATS on {nats_url}")
         await nc.close()
     except Exception as e:
-        print(f"Erreur: {e}")
+        print(f"⚠️ Error publishing job: {e}")
 
-if __name__ == '__main__':
-    asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(send_job())
