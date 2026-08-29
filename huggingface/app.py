@@ -178,10 +178,17 @@ async def chat_completions(request: Request):
     job_id = f"req-hf-{int(time.time()*1000)}"
     t0 = time.perf_counter()
 
-    # Dispatch to connected worker if available
+    # Dispatch to connected worker if available (round-robin / energy-aware)
     if connected_workers:
-        chosen_wid = list(connected_workers.keys())[0]
-        worker = connected_workers[chosen_wid]
+        # Choose worker with least active jobs or priority on green solar
+        sorted_workers = sorted(
+            connected_workers.items(),
+            key=lambda item: (
+                0 if "SOLAR" in str(item[1].get("power", {}).get("status", "")) else 1,
+                item[1].get("jobs", 0)
+            )
+        )
+        chosen_wid, worker = sorted_workers[0]
         fut = asyncio.get_event_loop().create_future()
         pending_inference_jobs[job_id] = fut
 
@@ -196,12 +203,15 @@ async def chat_completions(request: Request):
         try:
             res_data = await asyncio.wait_for(fut, timeout=5.0)
             output_text = res_data.get("output", f"SynCoin Inférence completed: {user_prompt[:40]}...")
-            worker_id = chosen_wid
+            worker_id = res_data.get("node", chosen_wid)
+            energy_tag = worker.get("power", {}).get("status", "GREEN_SOLAR")
         except asyncio.TimeoutError:
             worker_id = "hf-cloud-fallback"
+            energy_tag = "PUBLIC_RELAY"
             output_text = f"[SynCoin Green Mesh (HF Space)]: '{user_prompt}' processed across decentralized peers."
     else:
         worker_id = "hf-space-direct"
+        energy_tag = "PUBLIC_RELAY"
         output_text = f"[SynCoin Green Mesh (HF Space)]: '{user_prompt}' processed across decentralized peers."
 
     duration = time.perf_counter() - t0
@@ -233,7 +243,7 @@ async def chat_completions(request: Request):
         },
         "syncoin_settlement": {
             "producer_worker_id": worker_id,
-            "energy_source": "GREEN_SOLAR_OR_PUBLIC_RELAY",
+            "energy_source": energy_tag,
             "worker_payout_olona": round(payout_olona, 4),
             "worker_payout_share": "100%",
             "inference_duration_ms": round(duration * 1000, 2)
