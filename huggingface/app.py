@@ -261,6 +261,7 @@ async def marketplace_stats():
         "mesh": "SynCoin Free & Open Public Hub (Hugging Face Edition)",
         "total_tokens_inferred": total_tokens_inferred,
         "total_olona_distributed": round(total_olona_distributed, 2),
+        "producer_revenue_share": "100%",
         "producers_count": len(connected_workers),
         "active_workers": [
             {"worker_id": wid, "jobs": w.get("jobs", 0), "olona": round(w.get("olona", 0.0), 2)}
