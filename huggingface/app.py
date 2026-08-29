@@ -255,14 +255,17 @@ async def chat_completions(request: Request):
             output_text = res_data.get("output", f"SynCoin Inférence completed: {user_prompt[:40]}...")
             worker_id = res_data.get("node", chosen_wid)
             energy_tag = worker.get("power", {}).get("status", "GREEN_SOLAR")
+            proof_hash = res_data.get("proof_hash", hashlib.sha256(f"{user_prompt}-{worker_id}".encode()).hexdigest())
         except asyncio.TimeoutError:
             worker_id = "hf-cloud-fallback"
             energy_tag = "PUBLIC_RELAY"
             output_text = f"[SynCoin Green Mesh (HF Space)]: '{user_prompt}' processed across decentralized peers."
+            proof_hash = hashlib.sha256(f"{user_prompt}-{job_id}".encode()).hexdigest()
     else:
         worker_id = "hf-space-direct"
         energy_tag = "PUBLIC_RELAY"
         output_text = f"[SynCoin Green Mesh (HF Space)]: '{user_prompt}' processed across decentralized peers."
+        proof_hash = hashlib.sha256(f"{user_prompt}-{job_id}".encode()).hexdigest()
 
     duration = time.perf_counter() - t0
     tokens_generated = max(15, len(output_text.split()) * 2)
@@ -294,6 +297,7 @@ async def chat_completions(request: Request):
         "syncoin_settlement": {
             "producer_worker_id": worker_id,
             "energy_source": energy_tag,
+            "proof_of_compute_hash": proof_hash,
             "worker_payout_olona": round(payout_olona, 4),
             "worker_payout_share": "100%",
             "inference_duration_ms": round(duration * 1000, 2)
