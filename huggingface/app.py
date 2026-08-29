@@ -313,6 +313,7 @@ async def marketplace_stats():
         "total_tokens_inferred": total_tokens_inferred,
         "total_olona_distributed": round(total_olona_distributed, 2),
         "producer_revenue_share": "100%",
+        "fee_rate": "0.0%",
         "producers_count": len(connected_workers),
         "active_workers": [
             {"worker_id": wid, "jobs": w.get("jobs", 0), "olona": round(w.get("olona", 0.0), 2)}
