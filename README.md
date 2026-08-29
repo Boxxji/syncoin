@@ -71,30 +71,56 @@ graph TD
 
 ---
 
-## 📦 Quick Start (Zero-Config)
+## 📦 Quick Start & Applications Multi-Plateformes
 
-### 1. Run the SynCoin Node & Energy Arbiter
+### 1. 🖥️ Application Desktop (macOS & Windows PC)
+Lancez l'interface graphique de bureau avec jauges solaires et gains en direct :
 ```bash
-# Clone the repository
-git clone https://github.com/Boxxji/syncoin.git
-cd syncoin
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Start the P2P Node with NATS & Energy Trigger
-python3 syncoin_node.py --port 8766 --nats nats://localhost:4222
+cd desktop
+python3 desktop_app.py
+```
+*Pour générer l'exécutable autonome (`.app` ou `.exe`) :*
+```bash
+python3 package_desktop.py
 ```
 
-### 2. Run the Universal Worker (Any PC / Mac / Linux / Raspberry Pi)
+### 2. 📱 Application iOS Native (iPhone & iPad)
+- Ouvrez `ios/SynCoin.xcodeproj` dans **Xcode**.
+- Connectez votre iPhone ou lancez le simulateur.
+- L'application active automatiquement le moteur **Wasm3** sur processeur Apple Silicon lorsque l'appareil est branché sur secteur/solaire.
+
+### 3. 🤖 Application Android & Mobile (Flutter)
 ```bash
-# Connect your machine as a green compute worker
-python3 syncoin_worker.py --server ws://localhost:8766 --auto-solar
+cd mobile/app
+flutter pub get
+flutter run
 ```
 
-### 3. iOS Native App (SwiftUI + Wasm3)
-- Open `ios/SynCoin.xcodeproj` in Xcode.
-- Run on any iPhone or iPad. It connects to the nearest Hub and automatically starts processing WASM micro-jobs when plugged into power!
+### 4. 🌐 Gateway d'Inférence & Marketplace (Compatible OpenAI)
+Démarrez la passerelle permettant aux entreprises et développeurs de consommer de l'inférence décarbonée :
+```bash
+python3 syncoin_gateway.py
+```
+**Exemple d'appel client (curl) :**
+```bash
+curl -X POST http://localhost:8767/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "syncoin-green-slm",
+    "messages": [{"role": "user", "content": "Quelle est l'\''importance du calcul décarboné ?"}]
+  }'
+```
+*Réponse instantanée avec règlement financier automatique (90% au producteur particulier / 10% ASBL Arbres).*
+
+---
+
+## 💰 Modèle Économique & Rémunération Équitable
+
+| Rôle | Flux Financier / Énergétique | Rémunération |
+| :--- | :--- | :--- |
+| **Producteur Particulier** (Mac, PC, iPhone, Android) | Fournit le surplus solaire / batterie et la puissance GPU/NPU. | **90% des revenus d'inférence** versés instantanément en Tokens Olona / Solana. |
+| **Planète & Écologie (ASBL)** | Reforestation mondiale certifiée. | **10% des revenus** convertis automatiquement pour planter des arbres. |
+| **Client / Entreprise** | Envoie ses requêtes via l'API OpenAI standard. | Inférence IA décarbonée, souveraine et jusqu'à 70% moins chère que les hyperscalers. |
 
 ---
 
