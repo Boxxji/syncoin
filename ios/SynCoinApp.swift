@@ -62,6 +62,10 @@ class NodeConnection: ObservableObject {
     
     init() {
         setupWallet()
+        // Auto-connect for PoC testing
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.connect()
+        }
     }
     
     private func setupWallet() {
@@ -88,8 +92,8 @@ class NodeConnection: ObservableObject {
     }
     
     func connect() {
-        guard let url = URL(string: "ws://168.231.83.190:8766") else { return }
-        addLog("CONNECTING TO SYNCOIN NETWORK [ws://168.231.83.190:8766]")
+        guard let url = URL(string: "wss://syncoin.cloud") else { return }
+        addLog("CONNECTING TO SYNCOIN NETWORK [wss://syncoin.cloud]")
         
         let session = URLSession(configuration: .default)
         webSocketTask = session.webSocketTask(with: url)
@@ -145,6 +149,36 @@ class NodeConnection: ObservableObject {
         guard let data = text.data(using: .utf8),
               let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             addLog("RECV: \(text)")
+            return
+        }
+        
+        if let action = json["action"] as? String, action == "execute_wasm" {
+            if let payloadString = json["payload"] as? String,
+               let wasmData = Data(base64Encoded: payloadString) {
+                let bytes = [UInt8](wasmData)
+                
+                DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                    guard let self = self else { return }
+                    do {
+                        let engine = try WasmEngine()
+                        try engine.loadModule(wasmBytes: bytes)
+                        // Example: Call a function named "test_hash"
+                        // Wasm3 may require arguments, we pass an empty array if none.
+                        let result = try engine.callFunction("test_hash", args: [])
+                        
+                        DispatchQueue.main.async {
+                            self.addLog("WASM JOB EXECUTED. RESULT: \(result)")
+                            // Envoi du résultat au VPS
+                            let msg = "{\"action\": \"wasm_result\", \"result\": \(result), \"address\": \"\(self.solanaAddress)\"}"
+                            self.webSocketTask?.send(.string(msg)) { _ in }
+                        }
+                    } catch {
+                        DispatchQueue.main.async {
+                            self.addLog("WASM EXECUTION FAILED: \(error)")
+                        }
+                    }
+                }
+            }
             return
         }
         

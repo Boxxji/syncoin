@@ -7,12 +7,72 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0F3D6CCF64E6942731DECCFF /* m3_api_meta_wasi.c in Sources */ = {isa = PBXBuildFile; fileRef = 0CCCDCD596641AD7BD318619 /* m3_api_meta_wasi.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		13C9F46844157EE995BFF5F6 /* m3_info.c in Sources */ = {isa = PBXBuildFile; fileRef = 70D65373CDBDDE1820663A6B /* m3_info.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		1BB776A6E2403B9BDE0EF4A7 /* m3_bind.c in Sources */ = {isa = PBXBuildFile; fileRef = E6F6148186FBD2BC3BD03D38 /* m3_bind.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		226452D47BB380920E5E7851 /* m3_core.c in Sources */ = {isa = PBXBuildFile; fileRef = 4148ECB645CDCFA4A3C64349 /* m3_core.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		2493E14C5314FF4F62E0D9B6 /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = B762ED01BA4EF87ACC239454 /* CMakeLists.txt */; };
+		25C4143023B844485384E751 /* m3_env.c in Sources */ = {isa = PBXBuildFile; fileRef = 6613592E3A0086C535267DA2 /* m3_env.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		384F272EA4A1411D62CE1541 /* m3_extensions.c in Sources */ = {isa = PBXBuildFile; fileRef = 5B4D018E52365069266C17E2 /* m3_extensions.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		3CB06D601E93CD96E2E28FA7 /* m3_module.c in Sources */ = {isa = PBXBuildFile; fileRef = 49B6D7FC09E3B644E3085B01 /* m3_module.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		4D26005BC7DDA44ECF3BDA70 /* m3_api_uvwasi.c in Sources */ = {isa = PBXBuildFile; fileRef = 747D779EF9A3D6DEE86939BC /* m3_api_uvwasi.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		4F168D29CDEFBD6FB50B2B0A /* m3_api_libc.c in Sources */ = {isa = PBXBuildFile; fileRef = 7BAB6758E199912BE56D080A /* m3_api_libc.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		64664316FCE686D2F274E776 /* m3_compile.c in Sources */ = {isa = PBXBuildFile; fileRef = 39F4DFEAFCAC590E68904B00 /* m3_compile.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		69DE12064C864B55F6DA0B76 /* m3_parse.c in Sources */ = {isa = PBXBuildFile; fileRef = BC98C3D144217316A490DAE5 /* m3_parse.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		799BC8D7451F52387239F135 /* m3_api_tracer.c in Sources */ = {isa = PBXBuildFile; fileRef = EDEEBA2A2BA85FEF1803BE5C /* m3_api_tracer.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		A003325FB84F64DD404DFFE0 /* m3_exec.c in Sources */ = {isa = PBXBuildFile; fileRef = 548F8DBD8BCC56A8F4F1C5B9 /* m3_exec.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		AE0BF806D05C3E02F5C7FDD0 /* m3_code.c in Sources */ = {isa = PBXBuildFile; fileRef = 75E422B8A718301B72D4224C /* m3_code.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		B8256F210C45C4768AC52276 /* m3_api_wasi.c in Sources */ = {isa = PBXBuildFile; fileRef = F6710AFDAB1DB38CEC7D3F1C /* m3_api_wasi.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
 		C7FDB2E0AF48279371A2EC38 /* SynCoinApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A19F6A1417F7BE7DDAF68AF7 /* SynCoinApp.swift */; };
+		E03C30F22F25B779602BB907 /* m3_function.c in Sources */ = {isa = PBXBuildFile; fileRef = 4F4547780DBC5303768124DF /* m3_function.c */; settings = {COMPILER_FLAGS = "-Wno-everything"; }; };
+		F954E1511C8B47C4FD4918DC /* WasmEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BF8BD254F31AC792CEE5F77 /* WasmEngine.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		006E99006516929DA4E5748E /* m3_exception.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_exception.h; sourceTree = "<group>"; };
+		0CCCDCD596641AD7BD318619 /* m3_api_meta_wasi.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_api_meta_wasi.c; sourceTree = "<group>"; };
+		1576BDE599AA2D952BCA2826 /* m3_function.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_function.h; sourceTree = "<group>"; };
+		1AD9C5F0714D0F61C7644E30 /* m3_core.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_core.h; sourceTree = "<group>"; };
+		1B34CBCC95BB612348284CCA /* m3_compile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_compile.h; sourceTree = "<group>"; };
+		20DB30099C7C1926E65093A0 /* m3_config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_config.h; sourceTree = "<group>"; };
+		2F17B1DB5345B4693BA13269 /* m3_api_wasi.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_api_wasi.h; sourceTree = "<group>"; };
+		39F4DFEAFCAC590E68904B00 /* m3_compile.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_compile.c; sourceTree = "<group>"; };
+		3D4D1BDE2EDFF6BEA4B3428C /* fib64.wasm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fib64.wasm.h; sourceTree = "<group>"; };
+		40580A57F17E674F3A2CEBAE /* m3_math_utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_math_utils.h; sourceTree = "<group>"; };
+		4148ECB645CDCFA4A3C64349 /* m3_core.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_core.c; sourceTree = "<group>"; };
+		49B6D7FC09E3B644E3085B01 /* m3_module.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_module.c; sourceTree = "<group>"; };
+		4BF8BD254F31AC792CEE5F77 /* WasmEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WasmEngine.swift; sourceTree = "<group>"; };
+		4F4547780DBC5303768124DF /* m3_function.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_function.c; sourceTree = "<group>"; };
+		548F8DBD8BCC56A8F4F1C5B9 /* m3_exec.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_exec.c; sourceTree = "<group>"; };
+		5B4D018E52365069266C17E2 /* m3_extensions.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_extensions.c; sourceTree = "<group>"; };
+		6613592E3A0086C535267DA2 /* m3_env.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_env.c; sourceTree = "<group>"; };
+		69B23B64A1540350BE9855DA /* m3_bind.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_bind.h; sourceTree = "<group>"; };
+		70D65373CDBDDE1820663A6B /* m3_info.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_info.c; sourceTree = "<group>"; };
+		747D779EF9A3D6DEE86939BC /* m3_api_uvwasi.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_api_uvwasi.c; sourceTree = "<group>"; };
+		75E422B8A718301B72D4224C /* m3_code.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_code.c; sourceTree = "<group>"; };
+		7AC121656FAD0F615ED192A5 /* m3_code.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_code.h; sourceTree = "<group>"; };
+		7BAB6758E199912BE56D080A /* m3_api_libc.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_api_libc.c; sourceTree = "<group>"; };
+		8EA5F866F4F97633DC364B7D /* fib32_tail.wasm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fib32_tail.wasm.h; sourceTree = "<group>"; };
+		8FF09FF4693EDAE53C6AEF65 /* m3_env.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_env.h; sourceTree = "<group>"; };
+		9648BF4D3734803579FE9BDE /* m3_exec_defs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_exec_defs.h; sourceTree = "<group>"; };
 		A19F6A1417F7BE7DDAF68AF7 /* SynCoinApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynCoinApp.swift; sourceTree = "<group>"; };
+		A46E84A22DCAE66443794E08 /* wasi_core.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = wasi_core.h; sourceTree = "<group>"; };
+		A4F6E20585CDFE8BF4BB5641 /* coremark_minimal.wasm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = coremark_minimal.wasm.h; sourceTree = "<group>"; };
+		AC987B09A0CAE077D1CC403F /* m3_config_platforms.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_config_platforms.h; sourceTree = "<group>"; };
+		B3298CCF890515BDA67AF503 /* m3_api_tracer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_api_tracer.h; sourceTree = "<group>"; };
+		B762ED01BA4EF87ACC239454 /* CMakeLists.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		BC98C3D144217316A490DAE5 /* m3_parse.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_parse.c; sourceTree = "<group>"; };
+		BD38D0B26E9C4EC5F643EF02 /* m3_info.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_info.h; sourceTree = "<group>"; };
 		BFD1E8C4DBE0D5628E21F79C /* SynCoin.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = SynCoin.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D26FC36EB054A12E8A24D13C /* wasm3_ext.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = wasm3_ext.h; sourceTree = "<group>"; };
+		D8542DDABE8CBE5E9242F655 /* m3_api_libc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_api_libc.h; sourceTree = "<group>"; };
+		E304460B6EE268D72E0229DA /* wasm3.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = wasm3.h; sourceTree = "<group>"; };
+		E6F6148186FBD2BC3BD03D38 /* m3_bind.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_bind.c; sourceTree = "<group>"; };
+		EA0FA005D2234421E94B4147 /* m3_exec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = m3_exec.h; sourceTree = "<group>"; };
+		EDEEBA2A2BA85FEF1803BE5C /* m3_api_tracer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_api_tracer.c; sourceTree = "<group>"; };
+		F6710AFDAB1DB38CEC7D3F1C /* m3_api_wasi.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = m3_api_wasi.c; sourceTree = "<group>"; };
+		F690E9AC84FDFAF4739D84F8 /* fib32.wasm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fib32.wasm.h; sourceTree = "<group>"; };
+		FF58B3C5A1CA4A402B93AE25 /* wasm3_defs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = wasm3_defs.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -24,10 +84,77 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		89589C79A35282074D44B5ED /* source */ = {
+			isa = PBXGroup;
+			children = (
+				B762ED01BA4EF87ACC239454 /* CMakeLists.txt */,
+				7BAB6758E199912BE56D080A /* m3_api_libc.c */,
+				D8542DDABE8CBE5E9242F655 /* m3_api_libc.h */,
+				0CCCDCD596641AD7BD318619 /* m3_api_meta_wasi.c */,
+				EDEEBA2A2BA85FEF1803BE5C /* m3_api_tracer.c */,
+				B3298CCF890515BDA67AF503 /* m3_api_tracer.h */,
+				747D779EF9A3D6DEE86939BC /* m3_api_uvwasi.c */,
+				F6710AFDAB1DB38CEC7D3F1C /* m3_api_wasi.c */,
+				2F17B1DB5345B4693BA13269 /* m3_api_wasi.h */,
+				E6F6148186FBD2BC3BD03D38 /* m3_bind.c */,
+				69B23B64A1540350BE9855DA /* m3_bind.h */,
+				75E422B8A718301B72D4224C /* m3_code.c */,
+				7AC121656FAD0F615ED192A5 /* m3_code.h */,
+				39F4DFEAFCAC590E68904B00 /* m3_compile.c */,
+				1B34CBCC95BB612348284CCA /* m3_compile.h */,
+				AC987B09A0CAE077D1CC403F /* m3_config_platforms.h */,
+				20DB30099C7C1926E65093A0 /* m3_config.h */,
+				4148ECB645CDCFA4A3C64349 /* m3_core.c */,
+				1AD9C5F0714D0F61C7644E30 /* m3_core.h */,
+				6613592E3A0086C535267DA2 /* m3_env.c */,
+				8FF09FF4693EDAE53C6AEF65 /* m3_env.h */,
+				006E99006516929DA4E5748E /* m3_exception.h */,
+				9648BF4D3734803579FE9BDE /* m3_exec_defs.h */,
+				548F8DBD8BCC56A8F4F1C5B9 /* m3_exec.c */,
+				EA0FA005D2234421E94B4147 /* m3_exec.h */,
+				4F4547780DBC5303768124DF /* m3_function.c */,
+				1576BDE599AA2D952BCA2826 /* m3_function.h */,
+				70D65373CDBDDE1820663A6B /* m3_info.c */,
+				BD38D0B26E9C4EC5F643EF02 /* m3_info.h */,
+				40580A57F17E674F3A2CEBAE /* m3_math_utils.h */,
+				49B6D7FC09E3B644E3085B01 /* m3_module.c */,
+				BC98C3D144217316A490DAE5 /* m3_parse.c */,
+				FF58B3C5A1CA4A402B93AE25 /* wasm3_defs.h */,
+				E304460B6EE268D72E0229DA /* wasm3.h */,
+				F94A32B241DF2AC9A270A814 /* extensions */,
+				8C27EACFF99FA1C356431BF8 /* extra */,
+			);
+			name = source;
+			path = wasm3/source;
+			sourceTree = "<group>";
+		};
+		8C27EACFF99FA1C356431BF8 /* extra */ = {
+			isa = PBXGroup;
+			children = (
+				A4F6E20585CDFE8BF4BB5641 /* coremark_minimal.wasm.h */,
+				8EA5F866F4F97633DC364B7D /* fib32_tail.wasm.h */,
+				F690E9AC84FDFAF4739D84F8 /* fib32.wasm.h */,
+				3D4D1BDE2EDFF6BEA4B3428C /* fib64.wasm.h */,
+				A46E84A22DCAE66443794E08 /* wasi_core.h */,
+			);
+			path = extra;
+			sourceTree = "<group>";
+		};
+		F94A32B241DF2AC9A270A814 /* extensions */ = {
+			isa = PBXGroup;
+			children = (
+				5B4D018E52365069266C17E2 /* m3_extensions.c */,
+				D26FC36EB054A12E8A24D13C /* wasm3_ext.h */,
+			);
+			path = extensions;
+			sourceTree = "<group>";
+		};
 		FC7E7D504E2B6EA97F654F1E = {
 			isa = PBXGroup;
 			children = (
 				A19F6A1417F7BE7DDAF68AF7 /* SynCoinApp.swift */,
+				4BF8BD254F31AC792CEE5F77 /* WasmEngine.swift */,
+				89589C79A35282074D44B5ED /* source */,
 				088014B455E19CD93D141505 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -40,6 +167,7 @@
 			buildConfigurationList = BDBBC65101CA6381467374F5 /* Build configuration list for PBXNativeTarget "SynCoin" */;
 			buildPhases = (
 				9FBE74EC6AFBB677A4C3DC01 /* Sources */,
+				1941AFA8E5CA751CBE7CD7D2 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -86,12 +214,40 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		1941AFA8E5CA751CBE7CD7D2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2493E14C5314FF4F62E0D9B6 /* CMakeLists.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		9FBE74EC6AFBB677A4C3DC01 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				C7FDB2E0AF48279371A2EC38 /* SynCoinApp.swift in Sources */,
+				F954E1511C8B47C4FD4918DC /* WasmEngine.swift in Sources */,
+				4F168D29CDEFBD6FB50B2B0A /* m3_api_libc.c in Sources */,
+				0F3D6CCF64E6942731DECCFF /* m3_api_meta_wasi.c in Sources */,
+				799BC8D7451F52387239F135 /* m3_api_tracer.c in Sources */,
+				4D26005BC7DDA44ECF3BDA70 /* m3_api_uvwasi.c in Sources */,
+				B8256F210C45C4768AC52276 /* m3_api_wasi.c in Sources */,
+				1BB776A6E2403B9BDE0EF4A7 /* m3_bind.c in Sources */,
+				AE0BF806D05C3E02F5C7FDD0 /* m3_code.c in Sources */,
+				64664316FCE686D2F274E776 /* m3_compile.c in Sources */,
+				226452D47BB380920E5E7851 /* m3_core.c in Sources */,
+				25C4143023B844485384E751 /* m3_env.c in Sources */,
+				A003325FB84F64DD404DFFE0 /* m3_exec.c in Sources */,
+				384F272EA4A1411D62CE1541 /* m3_extensions.c in Sources */,
+				E03C30F22F25B779602BB907 /* m3_function.c in Sources */,
+				13C9F46844157EE995BFF5F6 /* m3_info.c in Sources */,
+				3CB06D601E93CD96E2E28FA7 /* m3_module.c in Sources */,
+				69DE12064C864B55F6DA0B76 /* m3_parse.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,6 +260,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = HX64G9BV5Z;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -111,6 +268,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.syncoin.app;
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "SynCoin-Bridging-Header.h";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -121,6 +279,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				DEVELOPMENT_TEAM = HX64G9BV5Z;
+				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -128,6 +287,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.syncoin.app;
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "SynCoin-Bridging-Header.h";
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;

@@ -11,3 +11,15 @@ services:
       - ./logs:/app/logs
     environment:
       - NODE_ENV=production
+      - NATS_URL=nats://nats:4222
+    depends_on:
+      - nats
+
+  nats:
+    image: nats:latest
+    container_name: syncoin_nats
+    restart: unless-stopped
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    command: ["-m", "8222"]

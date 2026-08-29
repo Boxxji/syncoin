@@ -13,8 +13,13 @@ targets:
     platform: iOS
     sources:
       - SynCoinApp.swift
+      - WasmEngine.swift
+      - path: wasm3/source
+        compilerFlags: ["-Wno-everything"]
     info:
       path: Info.plist
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: org.syncoin.app
       DEVELOPMENT_TEAM: HX64G9BV5Z
+      SWIFT_OBJC_BRIDGING_HEADER: SynCoin-Bridging-Header.h
+      ENABLE_BITCODE: NO

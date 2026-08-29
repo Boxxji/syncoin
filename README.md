@@ -1,85 +1,105 @@
-# SynCoin 🌱
+# SynCoin 🌱 — Universal Decarbonized AI Compute Network
 
-**Lend your phone while you sleep. Receive gifts. Change the world.**
+**Transform your solar surplus, residential batteries, and idle smartphones into a green, decentralized AI supercomputer.**
 
-[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.9+-green.svg)](syncoin_node.py)
-[![iOS](https://img.shields.io/badge/iOS-SwiftUI-orange.svg)](ios/)
-[![Flutter](https://img.shields.io/badge/Flutter-Mobile-blue.svg)](mobile/)
+[![iOS](https://img.shields.io/badge/iOS-SwiftUI%20%2B%20Wasm3-orange.svg)](ios/)
+[![NATS](https://img.shields.io/badge/Broker-NATS%20High--Velocity-blue.svg)](https://nats.io)
 [![Solana](https://img.shields.io/badge/Solana-Smart%20Contracts-purple.svg)](contracts/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-SynCoin is a P2P compute network that transforms idle smartphone power into **free data**, **rewards** (Olona/NFTs), and **planted trees**. 100% open source. 100% non-profit. 100% for the common good.
+SynCoin is a **100% Free & Open-Source (MIT)** decentralized compute network. It operates as a **Residential Micro-Neocloud** that unifies home solar panels, battery energy storage systems (BESS), desktop GPUs, and smartphones into a global, sovereign, and carbon-negative compute mesh.
 
 ---
 
-## Concept
+## ⚡ The Core Problem & The SynCoin Solution
 
-Your phone is powerful. When you're not using it, it does nothing. SynCoin uses a **small fraction of its power** (max 10% battery) to help the network compute complex tasks like **bioacoustic memory analysis (Zero-Supervision t-SNE on CETI data)**.
+- **Cloud Saturation & Energy Bottleneck**: Centralized AI datacenters face 3 to 6-year grid connection delays and massive water consumption.
+- **Wasted Solar & Battery Surplus**: Millions of homes generate fatal solar energy that is sold back to the grid at low rates.
+- **The SynCoin Model (Energy-First Compute)**: Move the compute to where clean energy already exists (**Grid Bypass**). Monétisez votre surplus solaire ou batterie sous forme d'inférence IA utile pour la recherche, les universités et les modèles ouverts (Mistral, Llama, DeepSeek).
 
-In return, you receive:
-- 🎁 **Olona** — gift currency of the network
-- 🖼️ **NFTs** — proof of your contribution
-- 📡 **Free data** — for you or those in need
-- 🌳 **Planted trees** — via our ASBL partner
-- 🎵 **MIDI** — a musical thank you
-- ₿ **Solana tokens** — transparent tracking
+---
 
-## For whom
+## 🏗️ Universal 4-Layer Architecture
 
-- **You** → lend your compute, receive gifts
-- **Universities, labs, NGOs** → free access to the network
-- **The planet** → trees planted for every contribution
-- **Everyone** → a freer, greener, fairer internet
+```mermaid
+graph TD
+    subgraph "1. Clean Energy Capture"
+        Solar["☀️ Solar Panels (1-10 kW)"] --> Inverter["⚡ Smart Meter / Inverter (MQTT / Modbus)"]
+        Battery["🔋 Home Battery (Tesla, Enphase, EcoFlow, BYD)"] <--> Inverter
+    end
 
-## Transparency
+    subgraph "2. SynCoin Energy Arbiter"
+        Inverter --> Arbiter["🧠 Energy Daemon (Surplus Arbitrage)"]
+        Arbiter --> Node["🌐 SynCoin P2P Node (NATS :4222 / WS :8766)"]
+    end
 
-Every transfer is recorded on the **Solana ledger**:
-- ✅ Anonymously encrypted
-- ✅ GDPR and MiCA compliant
-- ✅ Publicly auditable
+    subgraph "3. Distributed Workers"
+        Node --> Phone["📱 Smartphones (iOS Wasm3 / Android NPU)"]
+        Node --> PC["🖥️ Desktops & Servers (Nvidia CUDA / Apple Metal / AMD)"]
+    end
 
-## Ethics
+    subgraph "4. Decarbonized Value"
+        Phone --> Proof["🪙 Proof of Green Compute"]
+        PC --> Proof
+        Proof --> Rewards["🌱 Olona Tokens / ASBL Planted Trees / Solana"]
+    end
+```
 
-SynCoin refuses: ❌ Military computing, ❌ Data exploitation, ❌ Centralization
+---
 
-SynCoin is offered to: ✅ Universities, ✅ Research labs, ✅ Environmental NGOs
+## 🚀 Key Capabilities
 
-## Demo
+1. **🔋 Residential Micro-Neocloud & Battery Arbitrage**:
+   - Automatic detection of solar surplus ($P_{\text{solar}} - P_{\text{home}} > \text{threshold}$) via Home Assistant, MQTT, or Modbus.
+   - Dynamic power modulation: AI inference kicks in when energy is green and free, and pauses when home needs electricity.
+   - Battery Health Guard: Preserves battery cycle life and guarantees emergency power reserve ($>30\%$).
 
-🌍 **Landing page:** [SynCoin](docs/index.html) — interactive demo with live compute simulation
+2. **📱 Smartphone Edge Compute (iOS & Android)**:
+   - Zero-friction background computing via embedded **Wasm3 WebAssembly runtime** and Apple Silicon Neural Engine.
+   - **Guaranteed Eco-Safeguards**: Executes **only** when plugged into AC power, fully charged, on WiFi, and thermally nominal.
 
-## Quick Start
+3. **🔬 Useful Public-Good AI**:
+   - SLM Inférence (Small Language Models: Qwen, SmolLM, Phi, Gemma).
+   - Cetacean Bioacoustics & Marine Research (Zero-Supervision t-SNE / CETI project).
+   - Climate modeling, medical R&D, and open science.
 
+4. **🌱 Ecological Economics**:
+   - **Olona Tokens**: Transparent compute contribution tracking.
+   - **Tree Planting ASBL**: Automatic burning of Olona tokens to plant verified trees worldwide.
+
+---
+
+## 📦 Quick Start (Zero-Config)
+
+### 1. Run the SynCoin Node & Energy Arbiter
 ```bash
+# Clone the repository
 git clone https://github.com/Boxxji/syncoin.git
 cd syncoin
-python3 syncoin_node.py
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the P2P Node with NATS & Energy Trigger
+python3 syncoin_node.py --port 8766 --nats nats://localhost:4222
 ```
 
-## Architecture
-
-```
-syncoin_node.py    → P2P node
-mobile/            → Flutter app (iOS/Android)
-ios/               → Swift native app
-contracts/         → Solana smart contracts
-docs/              → Documentation
+### 2. Run the Universal Worker (Any PC / Mac / Linux / Raspberry Pi)
+```bash
+# Connect your machine as a green compute worker
+python3 syncoin_worker.py --server ws://localhost:8766 --auto-solar
 ```
 
-## License
-
-GNU AGPL v3 + Non-Commercial Clause. Free forever. For everyone.
+### 3. iOS Native App (SwiftUI + Wasm3)
+- Open `ios/SynCoin.xcodeproj` in Xcode.
+- Run on any iPhone or iPad. It connects to the nearest Hub and automatically starts processing WASM micro-jobs when plugged into power!
 
 ---
 
-🌱 *For Lilo. You were good. You were kind. You live in every tree we'll plant, every Olona offered, every compute shared.*
+## 📜 License & Open Source
 
-💜
-[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289DA?logo=discord)](https://discord.gg/syncoin)
+This project is licensed under the **MIT License** — free and open for the entire world.
 
-## Project Status
-- Version: 0.1.0 - Development complete
-- Platform: Python, iOS, Android (Flutter), Solana
-- License: AGPL v3 + Non-Commercial
-🌱 *Pour Lilo, pour le monde, pour nous.*
+🌱 *For Lilo, for the world, for all of us. Built with love and sovereign green energy.*
