@@ -137,6 +137,7 @@ Unlike centralized cloud providers that retain 70-80% operating margins, **SynCo
 - ☀️ [Solar & Home Battery (BESS) Integration Guide](docs/solar-batteries-guide.md)
 - 🌐 [OpenAI Gateway & Marketplace API Reference](docs/gateway-openai-api.md)
 - 🤗 [Free Public Mesh Hosting (Hugging Face / Nostr / WebRTC)](docs/public-mesh-hosting.md)
+- 🛡️ [Security, Privacy & Air-Gap Architecture Audit](docs/security-privacy-audit.md)
 - 🏛️ [System Architecture & Topologies](docs/architecture.md)
 - 💰 [Economic Payback & Token Mechanics](docs/economie.md)
 - 📜 [SynCoin Whitepaper v1.0](docs/whitepaper.md)

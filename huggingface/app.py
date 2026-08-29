@@ -115,7 +115,10 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             raw_text = await websocket.receive_text()
-            data = json.loads(raw_text)
+            try:
+                data = json.loads(raw_text)
+            except (json.JSONDecodeError, TypeError):
+                continue
             action = data.get("action")
 
             if action == "register":
